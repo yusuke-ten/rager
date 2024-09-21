@@ -1,0 +1,28 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+type {{pascalCase pageName}}Response = {
+  // レスポンスの型をここに定義
+};
+
+export async function GET(
+  req: NextRequest
+): Promise<NextResponse<{{pascalCase pageName}}Response>> {
+  try {
+    return NextResponse.json({ message: '{{pascalCase pageName}} GET request successful' });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(
+  req: NextRequest
+): Promise<NextResponse<{{pascalCase pageName}}Response>> {
+  try {
+    const body = await req.json();
+    return NextResponse.json({ message: '{{pascalCase pageName}} POST request successful', body });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

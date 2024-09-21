@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      PGUSER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-rager}
+      PGDATA: ${PGDATA:-/var/lib/postgresql/data/pgdata}
+    command: >
+      postgres -c 'max_connections=${POSTGRES_MAX_CONNECTIONS:-100}'
+               -c 'shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}'
+               -c 'work_mem=${POSTGRES_WORK_MEM:-4MB}'
+               -c 'maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}'
+               -c 'effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-4096MB}'
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    ports:
+      - '${EXPOSE_DB_PORT:-5432}:5432'
+    volumes:
+      - ./volumes/db/data:/var/lib/postgresql/data
+
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.26.1
+    restart: always
+    ports:
+      - '${EXPOSE_WEAVIATE_PORT:-8080}:8080'
+    environment:
+      QUERY_DEFAULTS_LIMIT: ${WEAVIATE_QUERY_LIMIT:-25}
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: ${WEAVIATE_ANONYMOUS_ACCESS:-true}
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: ${WEAVIATE_VECTORIZER_MODULE:-none}
+      ENABLE_MODULES: ${WEAVIATE_MODULES:-}
+      CLUSTER_HOSTNAME: 'node1'
+    volumes:
+      - ./volumes/weaviate:/var/lib/weaviate
+
+  neo4j:
+    image: neo4j:latest
+    restart: always
+    ports:
+      - '${EXPOSE_NEO4J_HTTP_PORT:-7474}:7474'
+      - '${EXPOSE_NEO4J_BOLT_PORT:-7687}:7687'
+    # volumes:
+    #   - ./volumes/neo4j:/var/lib/neo4j
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}
+      - NEO4J_dbms_memory_heap_initial__size=${NEO4J_HEAP_SIZE:-512m}
+      - NEO4J_dbms_memory_heap_max__size=${NEO4J_HEAP_MAX_SIZE:-1G}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
