@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import { Noto_Sans_JP } from 'next/font/google'
 
 import '@/assets/styles/globals.css'
-import { AuthProvider } from '@/hooks/use-auth'
 import { Toaster } from '@/components/ui/toaster'
 import { LoadingProvider } from '@/hooks/use-loading'
+
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '500', '700'],
   subsets: ['latin'],
@@ -26,12 +26,10 @@ export default function RootLayout({
   return (
     <html lang='ja' className={`${notoSansJP.variable}`}>
       <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          <LoadingProvider>
-            {children}
-            <Toaster />
-          </LoadingProvider>
-        </AuthProvider>
+        <LoadingProvider>
+          {children}
+          <Toaster />
+        </LoadingProvider>
       </body>
     </html>
   )

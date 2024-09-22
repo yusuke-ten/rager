@@ -5,7 +5,10 @@
     "source.fixAll.eslint": "explicit"
   },
   "[typescriptreact]": {},
-  "[typescript]": {},
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[jsonc]": {},
   "[javascript]": {},
   "[html]": {

@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -40,9 +42,8 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          <DropdownMenuItem asChild>
+            <Link href='/dashboard/account'>アカウント設定</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             Billing

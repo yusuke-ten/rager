@@ -15,7 +15,7 @@ const prisma = new PrismaClient()
 // Supabaseクライアントの初期化
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 export const embeddings = new OpenAIEmbeddings({
@@ -156,6 +156,12 @@ async function main() {
     return
   }
 
+  const tenant = await prisma.tenant.create({
+    data: {
+      name: 'サンプルテナント',
+    },
+  })
+
   // ユーザーをUserTableに追加
   for (const user of supabaseUsers.users) {
     await prisma.user.upsert({
@@ -164,17 +170,16 @@ async function main() {
         supabaseId: user.id,
         email: user.email,
         name: user.user_metadata.name || null,
-        // 必要に応じて他のフィールドを更新
+        tenantId: tenant.id,
       },
       create: {
         supabaseId: user.id,
         email: user.email || '',
         name: user.user_metadata.name || null,
+        tenantId: tenant.id,
       },
     })
   }
-
-  console.log(`${supabaseUsers.users.length}人のユーザーをUserTableに追加しました。`)
 }
 
 main()

@@ -6,7 +6,7 @@ module.exports = function (plop) {
         type: 'list',
         name: 'generatorType',
         message: '何を生成しますか？:',
-        choices: ['component', 'page', 'api'],
+        choices: ['component', 'page', 'api', 'type'],
       },
       {
         type: 'input',
@@ -28,6 +28,12 @@ module.exports = function (plop) {
         when: (answers) =>
           answers.generatorType === 'page' || answers.generatorType === 'api',
       },
+      {
+        type: 'input',
+        name: 'type',
+        message: 'ファイル名を入力してください:',
+        when: (answers) => answers.generatorType === 'type',
+      },
     ],
     actions: function (data) {
       const actions = []
@@ -38,19 +44,19 @@ module.exports = function (plop) {
             type: 'add',
             path: 'src/components/{{componentRoute}}/{{kebabCase componentName}}/{{kebabCase componentName}}.tsx',
             templateFile: 'plop-templates/component.tsx.hbs',
-            skipIfExists: true, // 追加
+            skipIfExists: true,
           },
           {
             type: 'add',
             path: 'src/components/{{componentRoute}}/{{kebabCase componentName}}/index.ts',
             templateFile: 'plop-templates/index.ts.hbs',
-            skipIfExists: true, // 追加
+            skipIfExists: true,
           },
           {
             type: 'add',
             path: 'src/components/{{componentRoute}}/{{kebabCase componentName}}/{{kebabCase componentName}}.stories.tsx',
             templateFile: 'plop-templates/component.stories.tsx.hbs',
-            skipIfExists: true, // 追加
+            skipIfExists: true,
           },
         )
       } else if (data.generatorType === 'page') {
@@ -61,7 +67,7 @@ module.exports = function (plop) {
           path: 'src/app/{{route}}/page.tsx',
           templateFile: 'plop-templates/page.tsx.hbs',
           data: { pageName: pageName },
-          skipIfExists: true, // 追加
+          skipIfExists: true,
         })
       } else if (data.generatorType === 'api') {
         const routeParts = data.route.split('/')
@@ -71,10 +77,16 @@ module.exports = function (plop) {
           path: 'src/app/api/{{route}}/route.ts',
           templateFile: 'plop-templates/route.ts.hbs',
           data: { pageName: pageName },
-          skipIfExists: true, // 追加
+          skipIfExists: true,
+        })
+      } else if (data.generatorType === 'type') {
+        actions.push({
+          type: 'add',
+          path: 'src/types/{{kebabCase type}}.ts',
+          templateFile: 'plop-templates/type.ts.hbs',
+          skipIfExists: true,
         })
       }
-
       return actions
     },
   })
