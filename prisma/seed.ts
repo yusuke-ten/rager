@@ -3,16 +3,15 @@ import type { Document } from '@langchain/core/documents'
 
 import path from 'path'
 import weaviate from 'weaviate-ts-client'
-import { PrismaClient } from '@prisma/client'
 import { WeaviateStore } from '@langchain/weaviate'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { createClient } from '@supabase/supabase-js'
+import { UserRole, PrismaClient } from '@prisma/client'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
 const prisma = new PrismaClient()
 
-// Supabaseクライアントの初期化
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -28,17 +27,48 @@ export const weaviateClient: WeaviateClient = weaviate.client({
 })
 
 function sanitizeText(text: string): string {
-  // ヌルバイトを除去
   text = text.replace(/\0/g, '')
   return text
 }
 
 async function main() {
-  // ここにシードデータを定義し、データベースに挿入するコードを書きます
+  const tenant = await prisma.tenant.create({
+    data: {
+      name: 'サンプルテナント',
+    },
+  })
+
+  const { data: supabaseUsers, error } = await supabase.auth.admin.listUsers()
+  if (error) {
+    console.error('Supabaseからユーザーを取得できませんでした:', error)
+    return
+  }
+
+  for (const user of supabaseUsers.users) {
+    await prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        supabaseId: user.id,
+        email: user.email,
+        name: user.user_metadata.display_name || null,
+        role: UserRole.ADMIN,
+        tenantId: tenant.id,
+      },
+      create: {
+        supabaseId: user.id,
+        email: user.email || '',
+        name: user.user_metadata.display_name || null,
+        role: UserRole.ADMIN,
+        tenantId: tenant.id,
+      },
+    })
+  }
+
   const knowledgeBase = await prisma.knowledgeBase.create({
     data: {
       name: 'サンプルナレッジベース',
       description: 'これはサンプルのナレッジベースです。',
+      tenantId: tenant.id,
     },
   })
 
@@ -85,7 +115,6 @@ async function main() {
     throw new Error('Failed to add data to Weaviate')
   }
 
-  // Prismaにドキュメントを保存
   const newDocument = await prisma.document.create({
     data: {
       knowledgeBaseId: knowledgeBase.id,
@@ -113,12 +142,13 @@ async function main() {
       name: 'サンプルボット',
       description: 'これはサンプルのボットです。',
       type: 'CHATBOT',
-      systemPrompt: 'あなたはサンプルボットです。', // この行を追加
       BotKnowledgeBase: {
         create: {
           knowledgeBaseId: knowledgeBase.id,
         },
       },
+      systemPrompt: 'あなたはサンプルボットです。',
+      tenantId: tenant.id,
     },
   })
 
@@ -148,38 +178,6 @@ async function main() {
       },
     ],
   })
-
-  // Supabaseからユーザー一覧を取得
-  const { data: supabaseUsers, error } = await supabase.auth.admin.listUsers()
-  if (error) {
-    console.error('Supabaseからユーザーを取得できませんでした:', error)
-    return
-  }
-
-  const tenant = await prisma.tenant.create({
-    data: {
-      name: 'サンプルテナント',
-    },
-  })
-
-  // ユーザーをUserTableに追加
-  for (const user of supabaseUsers.users) {
-    await prisma.user.upsert({
-      where: { id: user.id },
-      update: {
-        supabaseId: user.id,
-        email: user.email,
-        name: user.user_metadata.name || null,
-        tenantId: tenant.id,
-      },
-      create: {
-        supabaseId: user.id,
-        email: user.email || '',
-        name: user.user_metadata.name || null,
-        tenantId: tenant.id,
-      },
-    })
-  }
 }
 
 main()

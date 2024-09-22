@@ -3,9 +3,17 @@ import { revalidatePath } from 'next/cache'
 
 import prisma from '@/lib/prisma'
 import { Knowledge } from '@/components/knowledge/knowledge'
+import { getCurrentTenant } from '@/lib/auth/getCurrentTenant'
 
 const getKnowledge = async () => {
+  const tenant = await getCurrentTenant()
+  if (!tenant) {
+    throw new Error('tenant not found')
+  }
   return await prisma.knowledgeBase.findMany({
+    where: {
+      tenantId: tenant.id,
+    },
     orderBy: {
       createdAt: 'desc',
     },

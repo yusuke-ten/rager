@@ -86,7 +86,6 @@ const Knowledge = ({
     <>
       <div className='container mx-auto p-6'>
         <header className='mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
-          <h1 className='text-2xl font-bold'>Welcome back, yusuke-ten</h1>
           <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row'>
             <Input className='w-full sm:w-64' type='search' placeholder='Search' />
             <Button className='w-full sm:w-auto' onClick={() => setOpen(true)}>

@@ -13,6 +13,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tenant {
+  id             String          @id @default(uuid())
+  name           String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  users          User[]
+  bots           Bot[]
+  knowledgeBases KnowledgeBase[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id         String   @id @default(uuid())
+  supabaseId String   @unique
+  email      String   @unique
+  name       String?
+  avatarUrl  String?
+  role       UserRole @default(USER)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+}
+
 model KnowledgeBase {
   id               String             @id @default(uuid())
   name             String
@@ -21,6 +49,8 @@ model KnowledgeBase {
   updatedAt        DateTime           @updatedAt
   documents        Document[]
   BotKnowledgeBase BotKnowledgeBase[]
+  Tenant           Tenant?            @relation(fields: [tenantId], references: [id])
+  tenantId         String?
 }
 
 model Document {
@@ -72,6 +102,8 @@ model Bot {
   updatedAt               DateTime           @updatedAt
   BotKnowledgeBase        BotKnowledgeBase[]
   Conversation            Conversation[]
+  Tenant                  Tenant             @relation(fields: [tenantId], references: [id])
+  tenantId                String
 }
 
 model BotKnowledgeBase {
@@ -107,30 +139,4 @@ model Message {
   content        String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-}
-
-enum UserRole {
-  USER
-  ADMIN
-}
-
-model User {
-  id         String   @id @default(uuid())
-  supabaseId String   @unique
-  email      String   @unique
-  name       String?
-  avatarUrl  String?
-  role       UserRole @default(USER)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  tenantId   String?
-  tenant     Tenant?  @relation(fields: [tenantId], references: [id])
-}
-
-model Tenant {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
 }

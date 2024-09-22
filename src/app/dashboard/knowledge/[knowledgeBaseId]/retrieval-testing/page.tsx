@@ -6,8 +6,8 @@ import { WeaviateStore } from '@langchain/weaviate'
 import { OpenAIEmbeddings } from '@langchain/openai'
 
 import prisma from '@/lib/prisma'
+import { checkKnowledgeBaseAccess } from '@/lib/auth/checkKnowledgeBaseAccess'
 import { RetrievalTesting } from '@/components/retrieval-testing/retrieval-testing'
-
 export const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
 })
@@ -22,6 +22,9 @@ export default async function DatasetPage({
 }: {
   params: { knowledgeBaseId: string }
 }) {
+  if (!(await checkKnowledgeBaseAccess(params.knowledgeBaseId))) {
+    return <div>Knowledge base not found</div>
+  }
   const handleRetrievalTesting = async (query: string): Promise<DocumentSegment[]> => {
     'use server'
     const knowledgeBase = await prisma.knowledgeBase.findUnique({

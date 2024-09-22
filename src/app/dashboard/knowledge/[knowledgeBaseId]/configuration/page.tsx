@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache'
 
 import prisma from '@/lib/prisma'
 import { Dataset } from '@/components/dataset/dataset'
+import { checkKnowledgeBaseAccess } from '@/lib/auth/checkKnowledgeBaseAccess'
 
 export async function getDocuments(knowledgeBaseId: string) {
   try {
@@ -23,6 +24,9 @@ export default async function DatasetPage({
 }: {
   params: { knowledgeBaseId: string }
 }) {
+  if (!(await checkKnowledgeBaseAccess(params.knowledgeBaseId))) {
+    return <div>Knowledge base not found</div>
+  }
   const documents: Document[] = await getDocuments(params.knowledgeBaseId)
 
   async function refreshDocuments() {

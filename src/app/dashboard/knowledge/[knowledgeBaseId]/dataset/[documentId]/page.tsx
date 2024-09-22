@@ -6,6 +6,7 @@ import {
 
 import prisma from '@/lib/prisma'
 import { Document } from '@/components/document/document'
+import { checkKnowledgeBaseAccess } from '@/lib/auth/checkKnowledgeBaseAccess'
 
 const getDocument = async (knowledgeBaseId: string, documentId: string) => {
   const document = await prisma.document.findUnique({
@@ -34,6 +35,9 @@ export default async function DocumentPage({
 }: {
   params: { knowledgeBaseId: string; documentId: string }
 }) {
+  if (!(await checkKnowledgeBaseAccess(params.knowledgeBaseId))) {
+    return <div>Knowledge base not found</div>
+  }
   const { knowledgeBaseId, documentId } = params
   const document: DocumentType | null = await getDocument(knowledgeBaseId, documentId)
   const documentSegments: DocumentSegmentType[] = await getDocumentSegments(
