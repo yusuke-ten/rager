@@ -3,7 +3,6 @@ import { BaseListChatMessageHistory } from '@langchain/core/chat_history'
 
 import prisma from '@/lib/prisma'
 
-
 export class PrismaMessageHistory extends BaseListChatMessageHistory {
   lc_namespace = ['langchain', 'chat_history', 'prisma']
 

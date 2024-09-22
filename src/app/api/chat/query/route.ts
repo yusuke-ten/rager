@@ -38,13 +38,13 @@ type QueryResponse = {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: { conversationId: string } },
 ): Promise<NextResponse<QueryResponse>> {
   try {
-    const body = await req.json();
-    let { conversationId } = body;
-    const query = body.query || 'このPDFは何？';
-    const botId = body.botId;
+    const body = await req.json()
+    let { conversationId } = body
+    const query = body.query || 'このPDFは何？'
+    const botId = body.botId
 
     if (!botId) {
       throw new Error('Bot ID is required')
@@ -64,17 +64,17 @@ export async function POST(
 
     const botKnowledgeBase = await prisma.botKnowledgeBase.findFirst({
       where: {
-        botId: botId
+        botId: botId,
       },
       include: {
-        knowledgeBase: true
-      }
+        knowledgeBase: true,
+      },
     })
-    
+
     if (!botKnowledgeBase || !botKnowledgeBase.knowledgeBase) {
       throw new Error('Knowledge base not found for this bot')
     }
-    
+
     const knowledgeBase = botKnowledgeBase.knowledgeBase
 
     const vectorStoreId = `Vector_index_${knowledgeBase.id.replace(/-/g, '_')}`
@@ -123,7 +123,7 @@ export async function POST(
     const encoder = new TextEncoder()
     let fullResponse = ''
     const pass = new PassThrough()
-    const messageHistory = new PrismaMessageHistory(conversationId);
+    const messageHistory = new PrismaMessageHistory(conversationId)
 
     const responseStream = new ReadableStream({
       async start(controller) {

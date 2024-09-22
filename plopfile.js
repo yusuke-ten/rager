@@ -17,7 +17,8 @@ module.exports = function (plop) {
       {
         type: 'input',
         name: 'componentRoute',
-        message: 'src/components/以下に続くコンポーネントのルーティングを入力してください（任意）:',
+        message:
+          'src/components/以下に続くコンポーネントのルーティングを入力してください（任意）:',
         when: (answers) => answers.generatorType === 'component',
       },
       {
