@@ -15,11 +15,12 @@ import { Button } from '@/components/ui/button'
 import { buttonVariants } from '@/components/ui/button'
 
 type Props = {
-  signUp: (data: { email: string; password: string }) => Promise<void>
+  signUp: (data: { email: string; username: string; password: string }) => Promise<void>
 }
 
 const signUpSchema = z.object({
   email: z.string().email('有効なメールアドレスを入力してください'),
+  username: z.string().min(3, 'ユーザー名は3文字以上で入力してください'),
   password: z.string().min(6, 'パスワードは6文字以上で入力してください'),
 })
 
@@ -37,6 +38,7 @@ export const SignUp = ({ signUp }: Props) => {
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: '',
+      username: '',
       password: '',
     },
   })
@@ -95,38 +97,55 @@ export const SignUp = ({ signUp }: Props) => {
           </div>
           <div className='grid gap-6'>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className='grid gap-4'>
-                <div className='grid gap-2'>
-                  <Label htmlFor='email'>メールアドレス</Label>
-                  <Input
-                    id='email'
-                    placeholder='name@example.com'
-                    type='email'
-                    autoCapitalize='none'
-                    autoComplete='email'
-                    autoCorrect='off'
-                    disabled={isLoading}
-                    {...register('email')}
-                  />
-                  {errors.email && (
-                    <p className='text-sm text-red-500'>{errors.email.message}</p>
-                  )}
-                </div>
-                <div className='mb-4 grid gap-2'>
-                  <Label htmlFor='password'>パスワード</Label>
-                  <Input
-                    id='password'
-                    placeholder='パスワードを入力'
-                    type='password'
-                    autoCapitalize='none'
-                    autoComplete='password'
-                    autoCorrect='off'
-                    disabled={isLoading}
-                    {...register('password')}
-                  />
-                  {errors.password && (
-                    <p className='text-sm text-red-500'>{errors.password.message}</p>
-                  )}
+              <div className='grid gap-8'>
+                <div className='grid gap-4'>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='email'>メールアドレス</Label>
+                    <Input
+                      id='email'
+                      placeholder='name@example.com'
+                      type='email'
+                      autoCapitalize='none'
+                      autoComplete='email'
+                      autoCorrect='off'
+                      disabled={isLoading}
+                      {...register('email')}
+                    />
+                    {errors.email && (
+                      <p className='text-sm text-red-500'>{errors.email.message}</p>
+                    )}
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='username'>ユーザー名</Label>
+                    <Input
+                      id='username'
+                      placeholder='ユーザー名を入力'
+                      type='text'
+                      autoCapitalize='none'
+                      autoCorrect='off'
+                      disabled={isLoading}
+                      {...register('username')}
+                    />
+                    {errors.username && (
+                      <p className='text-sm text-red-500'>{errors.username.message}</p>
+                    )}
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='password'>パスワード</Label>
+                    <Input
+                      id='password'
+                      placeholder='パスワードを入力'
+                      type='password'
+                      autoCapitalize='none'
+                      autoComplete='password'
+                      autoCorrect='off'
+                      disabled={isLoading}
+                      {...register('password')}
+                    />
+                    {errors.password && (
+                      <p className='text-sm text-red-500'>{errors.password.message}</p>
+                    )}
+                  </div>
                 </div>
                 <Button disabled={isLoading}>
                   {isLoading && <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />}

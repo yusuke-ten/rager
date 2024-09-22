@@ -6,10 +6,17 @@ import weaviate from 'weaviate-ts-client'
 import { PrismaClient } from '@prisma/client'
 import { WeaviateStore } from '@langchain/weaviate'
 import { OpenAIEmbeddings } from '@langchain/openai'
+import { createClient } from '@supabase/supabase-js'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
 const prisma = new PrismaClient()
+
+// Supabaseクライアントの初期化
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
@@ -141,6 +148,33 @@ async function main() {
       },
     ],
   })
+
+  // Supabaseからユーザー一覧を取得
+  const { data: supabaseUsers, error } = await supabase.auth.admin.listUsers()
+  if (error) {
+    console.error('Supabaseからユーザーを取得できませんでした:', error)
+    return
+  }
+
+  // ユーザーをUserTableに追加
+  for (const user of supabaseUsers.users) {
+    await prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        supabaseId: user.id,
+        email: user.email,
+        name: user.user_metadata.name || null,
+        // 必要に応じて他のフィールドを更新
+      },
+      create: {
+        supabaseId: user.id,
+        email: user.email || '',
+        name: user.user_metadata.name || null,
+      },
+    })
+  }
+
+  console.log(`${supabaseUsers.users.length}人のユーザーをUserTableに追加しました。`)
 }
 
 main()
