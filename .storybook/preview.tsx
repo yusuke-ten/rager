@@ -3,6 +3,7 @@ import type { Preview } from '@storybook/react'
 import '../src/assets/styles/globals.css'
 import { LoadingProvider } from '../src/hooks/use-loading'
 import { Noto_Sans_JP } from 'next/font/google'
+import { TooltipProvider } from '../src/components/ui/tooltip'
 
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '500', '700'],
@@ -30,7 +31,9 @@ const preview: Preview = {
     (Story) => (
       <div className={`${notoSansJP.variable} font-sans antialiased`}>
         <LoadingProvider>
-          <Story />
+          <TooltipProvider delayDuration={0}>
+            <Story />
+          </TooltipProvider>
         </LoadingProvider>
       </div>
     ),

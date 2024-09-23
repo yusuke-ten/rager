@@ -1,0 +1,1 @@
+export { StickyBreadcrumb } from './sticky-breadcrumb';

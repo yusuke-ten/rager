@@ -33,13 +33,6 @@ import {
   TableHead,
   TableHeader,
 } from '@/components/ui/table'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 type Props = {
   documents: Document[]
   knowledgeBaseId: string
@@ -121,18 +114,6 @@ const Dataset = ({
 
   return (
     <div className='container mx-auto'>
-      <Breadcrumb className='mb-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href='/dashboard/knowledge'>ナレッジベース</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <span className='font-semibold text-gray-900'>データセット</span>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
       <div className='rounded-lg bg-white p-6 shadow'>
         <div className='mb-4 flex justify-between'>
           <Select>

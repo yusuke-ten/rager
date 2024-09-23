@@ -44,12 +44,14 @@ export default async function KnowledgePage() {
     revalidatePath('/dashboard/knowledge')
   }
   return (
-    <Suspense fallback={<div>読み込み中...</div>}>
-      <Knowledge
-        knowledgeBases={knowledgeBases}
-        handleCreateKnowledge={handleCreateKnowledge}
-        handleDeleteKnowledge={handleDeleteKnowledge}
-      />
-    </Suspense>
+    <main className='flex-1 overflow-y-auto overflow-x-hidden'>
+      <Suspense fallback={<div>読み込み中...</div>}>
+        <Knowledge
+          knowledgeBases={knowledgeBases}
+          handleCreateKnowledge={handleCreateKnowledge}
+          handleDeleteKnowledge={handleDeleteKnowledge}
+        />
+      </Suspense>
+    </main>
   )
 }

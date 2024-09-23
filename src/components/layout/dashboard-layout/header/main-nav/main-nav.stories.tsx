@@ -4,7 +4,7 @@ import { MainNav } from './main-nav'
 
 const meta: Meta<typeof MainNav> = {
   component: MainNav,
-  title: 'Header/MainNav',
+  title: 'Layout/DashboardLayout/Header/MainNav',
   tags: ['autodocs'],
   parameters: {
     nextjs: {

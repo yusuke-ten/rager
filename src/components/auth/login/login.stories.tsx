@@ -6,6 +6,9 @@ const meta: Meta<typeof Login> = {
   title: 'Auth/Login',
   component: Login,
   tags: ['autodocs'],
+  parameters: {
+    layout: 'centered',
+  },
 }
 
 export default meta

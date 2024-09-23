@@ -5,6 +5,7 @@ import { Noto_Sans_JP } from 'next/font/google'
 import '@/assets/styles/globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { LoadingProvider } from '@/hooks/use-loading'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const notoSansJP = Noto_Sans_JP({
   weight: ['400', '500', '700'],
@@ -27,8 +28,10 @@ export default function RootLayout({
     <html lang='ja' className={`${notoSansJP.variable}`}>
       <body className={`font-sans antialiased`}>
         <LoadingProvider>
-          {children}
-          <Toaster />
+          <TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </LoadingProvider>
       </body>
     </html>

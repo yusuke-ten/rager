@@ -6,6 +6,9 @@ const meta: Meta<typeof SignUp> = {
   title: 'Auth/SignUp',
   component: SignUp,
   tags: ['autodocs'],
+  parameters: {
+    layout: 'centered',
+  },
 }
 
 export default meta

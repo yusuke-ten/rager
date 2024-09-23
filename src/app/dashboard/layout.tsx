@@ -1,5 +1,5 @@
 import { AuthProvider } from '@/hooks/use-auth'
-import { Header } from '@/components/header/header'
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
 
 export default function RootLayout({
   children,
@@ -8,13 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <AuthProvider>
-      <div className='flex h-screen'>
-        <div className='flex flex-1 flex-col overflow-hidden'>
-          <Header />
-          {/* Page content */}
-          {children}
-        </div>
-      </div>
+      <DashboardLayout>{children}</DashboardLayout>
     </AuthProvider>
   )
 }
