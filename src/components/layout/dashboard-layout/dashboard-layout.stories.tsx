@@ -8,7 +8,20 @@ import { AuthContext } from '@/hooks/use-auth'
 import { Sidebar } from '@/components/layout/dashboard-layout/sidebar/sidebar'
 import { StickyBreadcrumb } from '@/components/layout/dashboard-layout/sticky-breadcrumb/sticky-breadcrumb'
 
-import { DashboardLayout } from './dashboard-layout'
+import { Header } from './header/header'
+
+type Props = {
+  children: React.ReactNode
+}
+
+export const DashboardLayout = ({ children }: Props) => {
+  return (
+    <div className='flex min-h-screen w-full flex-col'>
+      <Header />
+      <div className={cn('mt-[64px] flex h-[calc(100vh-64px)] flex-col')}>{children}</div>
+    </div>
+  )
+}
 
 const meta: Meta<typeof DashboardLayout> = {
   title: 'Layout/DashboardLayout',
@@ -126,7 +139,7 @@ const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
       />
       <div
         className={cn(
-          'flex flex-1 flex-col border bg-muted/40 transition-all duration-300 ease-in-out sm:gap-4 sm:py-4',
+          'flex flex-1 flex-col overflow-hidden border transition-all duration-300 ease-in-out sm:gap-4 sm:py-4',
           isExpanded ? 'sm:pl-64' : 'sm:pl-16',
         )}
       >

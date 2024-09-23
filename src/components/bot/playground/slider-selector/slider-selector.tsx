@@ -1,44 +1,59 @@
 'use client'
 
-import * as React from 'react'
+import { useId, useState } from 'react'
 import { SliderProps } from '@radix-ui/react-slider'
 
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 
-interface TopPSelectorProps {
+interface SliderSelectorProps {
+  label: string
   defaultValue: SliderProps['defaultValue']
+  max: number
+  step: number
+  description: string
+  onCommit?: (value: number) => void
 }
 
-export function TopPSelector({ defaultValue }: TopPSelectorProps) {
-  const [value, setValue] = React.useState(defaultValue)
+export const SliderSelector = ({
+  label,
+  defaultValue,
+  max,
+  step,
+  description,
+  onCommit = () => {},
+}: SliderSelectorProps) => {
+  const [value, setValue] = useState(defaultValue)
+  const id = useId()
 
   return (
-    <div className='grid gap-2 pt-2'>
-      <HoverCard openDelay={200}>
+    <div className='w-full'>
+      <HoverCard openDelay={50}>
         <HoverCardTrigger asChild>
           <div className='grid gap-4'>
             <div className='flex items-center justify-between'>
-              <Label htmlFor='top-p'>Top P</Label>
+              <Label htmlFor={id}>{label}</Label>
               <span className='w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-sm text-muted-foreground hover:border-border'>
                 {value}
               </span>
             </div>
             <Slider
-              id='top-p'
-              max={1}
+              id={id}
+              max={max}
               defaultValue={value}
-              step={0.1}
+              step={step}
               onValueChange={setValue}
+              onValueCommit={(value) => {
+                onCommit(value[0])
+              }}
               className='[&_[role=slider]]:h-4 [&_[role=slider]]:w-4'
-              aria-label='Top P'
+              aria-label={label}
             />
           </div>
         </HoverCardTrigger>
         <HoverCardContent align='start' className='w-[260px] text-sm' side='left'>
-          Control diversity via nucleus sampling: 0.5 means half of all
-          likelihood-weighted options are considered.
+          {description}
         </HoverCardContent>
       </HoverCard>
     </div>

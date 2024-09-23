@@ -1,0 +1,1 @@
+export { SliderSelector } from './slider-selector';

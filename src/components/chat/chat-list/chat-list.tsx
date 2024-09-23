@@ -16,7 +16,7 @@ type Props = {
 
 export const ChatList = forwardRef<HTMLDivElement, Props>(({ messages }, ref) => {
   return (
-    <ScrollArea className='flex-grow p-4' ref={ref}>
+    <ScrollArea ref={ref}>
       {messages.map((message, index) => (
         <div
           key={index}

@@ -76,7 +76,7 @@ export const formSchema = z.object({
   emptyResponse: z.string().optional(),
   opener: z.string().optional(),
   showQuote: z.boolean(),
-  knowledgeBase: z.string().min(1, '知識ベースは必須です'),
+  knowledgeBase: z.string().min(1, 'ナレッジベースは必須です'),
   systemPrompt: z.string().min(1, '入力は必須です'),
   similarityThreshold: z.number().min(0).max(1),
   keywordSimilarityWeight: z.number().min(0).max(1),
@@ -184,7 +184,7 @@ export const CreateBotDialog = ({ knowledgeBases, handleCreateBot }: Props) => {
             <FormField
               label='空の応答'
               htmlFor='empty-response'
-              helpText={`知識ベースに関連情報がない場合の回答です。空欄の場合、AIが独自に回答を生成します。`}
+              helpText={`ナレッジベースに関連情報がない場合の回答です。空欄の場合、AIが独自に回答を生成します。`}
             >
               <Controller
                 name='emptyResponse'
@@ -238,10 +238,10 @@ export const CreateBotDialog = ({ knowledgeBases, handleCreateBot }: Props) => {
               />
             </FormField>
             <FormField
-              label='知識ベース'
+              label='ナレッジベース'
               htmlFor='knowledgebases'
               required
-              helpText='関連する知識ベースを選択してください。'
+              helpText='関連するナレッジベースを選択してください。'
             >
               <Controller
                 name='knowledgeBase'
@@ -250,7 +250,7 @@ export const CreateBotDialog = ({ knowledgeBases, handleCreateBot }: Props) => {
                   <div>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger>
-                        <SelectValue placeholder='知識ベースを選択' />
+                        <SelectValue placeholder='ナレッジベースを選択' />
                       </SelectTrigger>
                       <SelectContent>
                         {knowledgeBases.map((knowledgeBase) => (

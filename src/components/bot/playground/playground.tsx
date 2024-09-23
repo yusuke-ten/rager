@@ -1,274 +1,157 @@
-import { ReactNode } from 'react'
-import { CounterClockwiseClockIcon } from '@radix-ui/react-icons'
+'use client'
+import { useRef, useState, useEffect } from 'react'
 
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { ChatList } from '@/components/chat/chat-list'
+import { Setting } from '@/components/bot/playground/setting'
+import { MessageInput } from '@/components/bot/playground/message-input'
 
-import { types, models } from './data/models'
-import { TopPSelector } from './components/top-p-selector'
-import { ModelSelector } from './components/model-selector'
-import { MaxLengthSelector } from './components/maxlength-selector'
-import { TemperatureSelector } from './components/temperature-selector'
+export const description =
+  'サイドバーのナビゲーションとメインコンテンツエリアを持つAIプレイグラウンド。プレイグラウンドには、設定ドロワーと共有ボタンを持つヘッダーがあります。サイドバーにはナビゲーションリンクとユーザーメニューがあります。メインコンテンツエリアには、モデルとメッセージを設定するためのフォームが表示されます。'
 
 type Props = {
-  children: ReactNode
+  botId: string
 }
 
-export const Playground = ({ children }: Props) => {
+export function Playground({ botId }: Props) {
+  const [messages, setMessages] = useState<
+    { type: 'question' | 'answer'; content: string }[]
+  >([])
+  const [isMessageInputDisabled, setIsMessageInputDisabled] = useState(false)
+  const messageInputRef = useRef<HTMLDivElement>(null)
+  const [messageInputRefHeight, setMessageInputRefHeight] = useState<number | undefined>(
+    undefined,
+  )
+  const [systemPrompt, setSystemPrompt] = useState<string>(`
+Answer the user's question based on the following context:
+{context}
+
+User's question: {input}
+
+Please provide a detailed and accurate answer.
+    `)
+  const [temperature, setTemperature] = useState<number>(0.7)
+  const [maxLength, setMaxLength] = useState<number>(512)
+  const [topP, setTopP] = useState<number>(0.85)
+  const [topK, setTopK] = useState<number>(5)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (messageInputRef.current) {
+        setMessageInputRefHeight(messageInputRef.current.clientHeight)
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(handleResize)
+    if (messageInputRef.current) {
+      resizeObserver.observe(messageInputRef.current)
+    }
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [messageInputRef])
+
+  const handleSendMessage = async (query: string) => {
+    setIsMessageInputDisabled(true)
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { type: 'question', content: query },
+      { type: 'answer', content: '' },
+    ])
+    const response = await fetch(`/api/bot/playground/query`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        botId,
+        systemPrompt,
+        temperature,
+        maxLength,
+        topP,
+        topK,
+      }),
+    })
+
+    if (!response.ok || !response.body) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+
+    let accumulatedAnswer = ''
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      const chunk = decoder.decode(value, { stream: true })
+
+      const lines = chunk.split('\n\n')
+      for (const line of lines) {
+        console.log(line)
+        if (line.startsWith('data: ')) {
+          const jsonData = line.slice(6)
+          const data = JSON.parse(jsonData)
+
+          console.log(data)
+          if (data.answer) {
+            accumulatedAnswer += data.answer
+            setMessages((prevMessages) => {
+              const newMessages = [...prevMessages]
+              newMessages[newMessages.length - 1] = {
+                type: 'answer',
+                content: accumulatedAnswer,
+              }
+              return newMessages
+            })
+          }
+        }
+      }
+    }
+    setIsMessageInputDisabled(false)
+  }
+
   return (
-    <Tabs defaultValue='complete' className='flex-1'>
-      <div className='container h-full py-6'>
-        <div className='grid h-full items-stretch gap-6 md:grid-cols-[1fr_200px]'>
-          <div className='hidden flex-col space-y-4 sm:flex md:order-2'>
-            <div className='grid gap-2'>
-              <HoverCard openDelay={200}>
-                <HoverCardTrigger asChild>
-                  <span className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                    Mode
-                  </span>
-                </HoverCardTrigger>
-                <HoverCardContent className='w-[320px] text-sm' side='left'>
-                  Choose the interface that best suits your task. You can provide: a
-                  simple prompt to complete, starting and ending text to insert a
-                  completion within, or some text with instructions to edit it.
-                </HoverCardContent>
-              </HoverCard>
-              <TabsList className='grid grid-cols-3'>
-                <TabsTrigger value='complete'>
-                  <span className='sr-only'>Complete</span>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 20 20'
-                    fill='none'
-                    className='h-5 w-5'
-                  >
-                    <rect
-                      x='4'
-                      y='3'
-                      width='12'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='7'
-                      width='12'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='11'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='15'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='8.5'
-                      y='11'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='8.5'
-                      y='15'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='13'
-                      y='11'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                  </svg>
-                </TabsTrigger>
-                <TabsTrigger value='insert'>
-                  <span className='sr-only'>Insert</span>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 20 20'
-                    fill='none'
-                    className='h-5 w-5'
-                  >
-                    <path
-                      fillRule='evenodd'
-                      clipRule='evenodd'
-                      d='M14.491 7.769a.888.888 0 0 1 .287.648.888.888 0 0 1-.287.648l-3.916 3.667a1.013 1.013 0 0 1-.692.268c-.26 0-.509-.097-.692-.268L5.275 9.065A.886.886 0 0 1 5 8.42a.889.889 0 0 1 .287-.64c.181-.17.427-.267.683-.269.257-.002.504.09.69.258L8.903 9.87V3.917c0-.243.103-.477.287-.649.183-.171.432-.268.692-.268.26 0 .509.097.692.268a.888.888 0 0 1 .287.649V9.87l2.245-2.102c.183-.172.432-.269.692-.269.26 0 .508.097.692.269Z'
-                      fill='currentColor'
-                    ></path>
-                    <rect
-                      x='4'
-                      y='15'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='8.5'
-                      y='15'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='13'
-                      y='15'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                  </svg>
-                </TabsTrigger>
-                <TabsTrigger value='edit'>
-                  <span className='sr-only'>Edit</span>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 20 20'
-                    fill='none'
-                    className='h-5 w-5'
-                  >
-                    <rect
-                      x='4'
-                      y='3'
-                      width='12'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='7'
-                      width='12'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='11'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='4'
-                      y='15'
-                      width='4'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <rect
-                      x='8.5'
-                      y='11'
-                      width='3'
-                      height='2'
-                      rx='1'
-                      fill='currentColor'
-                    ></rect>
-                    <path
-                      d='M17.154 11.346a1.182 1.182 0 0 0-1.671 0L11 15.829V17.5h1.671l4.483-4.483a1.182 1.182 0 0 0 0-1.671Z'
-                      fill='currentColor'
-                    ></path>
-                  </svg>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            <ModelSelector types={types} models={models} />
-            <TemperatureSelector defaultValue={[0.56]} />
-            <MaxLengthSelector defaultValue={[256]} />
-            <TopPSelector defaultValue={[0.9]} />
+    <div className='grid h-full flex-1 gap-4 overflow-auto md:grid-cols-2 lg:grid-cols-3'>
+      <Setting
+        systemPrompt={systemPrompt}
+        setSystemPrompt={setSystemPrompt}
+        temperature={temperature}
+        setTemperature={setTemperature}
+        maxLength={maxLength}
+        setMaxLength={setMaxLength}
+        topP={topP}
+        setTopP={setTopP}
+        topK={topK}
+        setTopK={setTopK}
+      />
+      <div className='relative flex h-full min-h-[50vh] flex-col overflow-y-hidden rounded-xl p-4 lg:col-span-2'>
+        {messages.length === 0 ? (
+          <div className='flex h-full items-center justify-center'>
+            <p className='text-muted-foreground'>メッセージを入力してください</p>
           </div>
-          <div className='md:order-1'>
-            <TabsContent value='complete' className='mt-0 border-0 p-0'>
-              <div className='flex h-full flex-col space-y-4'>
-                <Textarea
-                  placeholder='Write a tagline for an ice cream shop'
-                  className='min-h-[400px] flex-1 p-4 md:min-h-[700px] lg:min-h-[700px]'
-                />
-                <div className='flex items-center space-x-2'>
-                  <Button>Submit</Button>
-                  <Button variant='secondary'>
-                    <span className='sr-only'>Show history</span>
-                    <CounterClockwiseClockIcon className='h-4 w-4' />
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value='insert' className='mt-0 border-0 p-0'>
-              <div className='flex flex-col space-y-4'>
-                <div className='grid h-full grid-rows-2 gap-6 lg:grid-cols-2 lg:grid-rows-1'>
-                  <Textarea
-                    placeholder="We're writing to [inset]. Congrats from OpenAI!"
-                    className='h-full min-h-[300px] lg:min-h-[700px] xl:min-h-[700px]'
-                  />
-                  <div className='rounded-md border bg-muted'></div>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Button>Submit</Button>
-                  <Button variant='secondary'>
-                    <span className='sr-only'>Show history</span>
-                    <CounterClockwiseClockIcon className='h-4 w-4' />
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value='edit' className='mt-0 border-0 p-0'>
-              <div className='flex flex-col space-y-4'>
-                <div className='grid h-full gap-6 lg:grid-cols-2'>
-                  <div className='flex flex-col space-y-4'>
-                    <div className='flex flex-1 flex-col space-y-2'>
-                      <Label htmlFor='input'>Input</Label>
-                      <Textarea
-                        id='input'
-                        placeholder='We is going to the market.'
-                        className='flex-1 lg:min-h-[580px]'
-                      />
-                    </div>
-                    <div className='flex flex-col space-y-2'>
-                      <Label htmlFor='instructions'>Instructions</Label>
-                      <Textarea id='instructions' placeholder='Fix the grammar.' />
-                    </div>
-                  </div>
-                  <div className='mt-[21px] min-h-[400px] rounded-md border bg-muted lg:min-h-[700px]' />
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Button>Submit</Button>
-                  <Button variant='secondary'>
-                    <span className='sr-only'>Show history</span>
-                    <CounterClockwiseClockIcon className='h-4 w-4' />
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
+        ) : (
+          <div
+            className='overflow-y-auto bg-white p-4'
+            style={{
+              marginBottom: messageInputRefHeight
+                ? `${messageInputRefHeight + 20}px`
+                : undefined,
+            }}
+          >
+            <ChatList messages={messages} />
           </div>
+        )}
+        <div ref={messageInputRef} className='absolute bottom-0 left-0 right-0 m-4'>
+          <MessageInput
+            onSubmit={handleSendMessage}
+            isDisabled={isMessageInputDisabled}
+          />
         </div>
       </div>
-    </Tabs>
+    </div>
   )
 }

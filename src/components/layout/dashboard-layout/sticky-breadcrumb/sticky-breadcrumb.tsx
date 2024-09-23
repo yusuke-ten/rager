@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 
 import {
@@ -21,7 +22,7 @@ export const StickyBreadcrumb = ({ breadcrumbItems }: Props) => {
       <Breadcrumb className='hidden md:flex'>
         <BreadcrumbList>
           {breadcrumbItems.map((breadcrumbItem, index) => (
-            <>
+            <React.Fragment key={breadcrumbItem.href}>
               <BreadcrumbItem key={breadcrumbItem.href}>
                 {breadcrumbItems.length !== index + 1 ? (
                   <BreadcrumbLink asChild>
@@ -34,7 +35,7 @@ export const StickyBreadcrumb = ({ breadcrumbItems }: Props) => {
                 )}
               </BreadcrumbItem>
               {breadcrumbItems.length !== index + 1 && <BreadcrumbSeparator />}
-            </>
+            </React.Fragment>
           ))}
         </BreadcrumbList>
       </Breadcrumb>

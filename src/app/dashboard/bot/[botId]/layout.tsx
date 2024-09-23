@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { Pencil, FileText, RefreshCw } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Sidebar } from '@/components/layout/dashboard-layout/sidebar/sidebar'
 import { StickyBreadcrumb } from '@/components/layout/dashboard-layout/sticky-breadcrumb/sticky-breadcrumb' // 追加
+import { Play } from 'lucide-react'
 
 export default function KnowledgeLayout({
   children,
@@ -17,25 +17,15 @@ export default function KnowledgeLayout({
   const [isExpanded, setIsExpanded] = useState(false)
   const navItems = [
     {
-      href: `/dashboard/knowledge/${params.knowledgeBaseId}/dataset`,
-      label: 'データセット',
-      icon: <FileText className='h-5 w-5' />,
-    },
-    {
-      href: `/dashboard/knowledge/${params.knowledgeBaseId}/retrieval-testing`,
-      label: '検索テスト',
-      icon: <RefreshCw className='h-5 w-5' />,
-    },
-    {
-      href: `/dashboard/knowledge/${params.knowledgeBaseId}/configuration`,
-      label: '設定',
-      icon: <Pencil className='h-5 w-5' />,
+      href: `/dashboard/bot/${params.botId}/playground`,
+      label: 'プレイグラウンド',
+      icon: <Play className='h-5 w-5' />,
     },
   ]
 
   const breadcrumbItems = [
-    { href: '/dashboard/knowledge', label: 'ナレッジベース' },
-    { href: `/dashboard/knowledge/${params.knowledgeBaseId}`, label: 'データセット' },
+    { href: '/dashboard/bot', label: 'ボット' },
+    { href: `/dashboard/bot/${params.botId}/playground`, label: 'プレイグラウンド' },
   ]
 
   return (
@@ -47,7 +37,7 @@ export default function KnowledgeLayout({
       />
       <div
         className={cn(
-          'flex flex-1 flex-col border transition-all duration-300 ease-in-out sm:gap-4 sm:py-4',
+          'flex flex-1 flex-col overflow-hidden border transition-all duration-300 ease-in-out sm:gap-4 sm:pt-4',
           isExpanded ? 'sm:pl-64' : 'sm:pl-16',
         )}
       >

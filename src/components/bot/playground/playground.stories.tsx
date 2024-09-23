@@ -7,7 +7,6 @@ const meta: Meta<typeof Playground> = {
   component: Playground,
   tags: ['autodocs'],
 }
-
 export default meta
 type Story = StoryObj<typeof Playground>
 
