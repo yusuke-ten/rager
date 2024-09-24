@@ -1,14 +1,15 @@
 import type { WeaviateClient } from 'weaviate-ts-client'
-import type { Document } from '@langchain/core/documents'
 
+import fs from 'fs'
+import path from 'path'
+import cuid from 'cuid'
+import { Queue } from 'bullmq'
 import weaviate from 'weaviate-ts-client'
 import { NextResponse } from 'next/server'
-import { WeaviateStore } from '@langchain/weaviate'
 import { OpenAIEmbeddings } from '@langchain/openai'
-import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
 import prisma from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 
 export const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
@@ -19,18 +20,43 @@ export const weaviateClient: WeaviateClient = weaviate.client({
   host: process.env.WEAVIATE_HOST || 'localhost:8080',
 })
 
-function sanitizeText(text: string): string {
-  // ヌルバイトを除去
-  text = text.replace(/\0/g, '')
-  return text
-}
+const pdfProcessingQueue = new Queue('pdfProcessing', {
+  connection: {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    password: process.env.REDIS_PASSWORD,
+  },
+})
 
 export async function POST(
   request: Request,
   { params }: { params: { knowledgeBaseId: string } },
 ) {
   try {
+    const supabase = createClient()
     const { knowledgeBaseId } = params
+    const {
+      data: { user: supabaseUser },
+    } = await supabase.auth.getUser()
+    if (!supabaseUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        supabaseId: supabaseUser.id,
+      },
+    })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const tenant = await prisma.tenant.findUnique({
+      where: {
+        id: user.tenantId,
+      },
+    })
+    if (!tenant) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     // PDFファイルを受け取る
     const formData = await request.formData()
     const file = formData.get('files') as File
@@ -39,83 +65,72 @@ export async function POST(
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    const pdfLoader = new PDFLoader(file)
-    const docs = await pdfLoader.load()
+    const storageDir = path.join(process.cwd(), 'storage')
 
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200,
-    })
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir)
+    }
 
-    const chunkedDocs: Document[] = []
-    let position = 1
-    await Promise.all(
-      docs.map(async (doc) => {
-        const chunks = await textSplitter.splitText(doc.pageContent)
-        chunks.forEach((chunk, index) => {
-          chunkedDocs.push({
-            pageContent: sanitizeText(chunk),
-            metadata: {
-              knowledgeBaseId,
-              position: position,
-            },
-          })
-          position += 1
-        })
-      }),
-    )
+    const extension = path.extname(file.name).replace('.', '')
+    const filePath = path.join(storageDir, tenant.id, `${cuid()}.${extension}`)
+    const dirPath = path.dirname(filePath)
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true })
+    }
+    fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()))
 
-    const knowledgeBase = await prisma.knowledgeBase.findUnique({
-      where: {
-        id: knowledgeBaseId,
+    await prisma.uploadFile.create({
+      data: {
+        name: file.name,
+        storageType: 'local',
+        key: filePath,
+        size: file.size,
+        extension: extension,
+        mimeType: file.type,
+        createdBy: user.id,
+        tenant: {
+          connect: {
+            id: tenant.id,
+          },
+        },
       },
     })
 
-    if (!knowledgeBase) {
-      throw new Error('Knowledge base not found')
-    }
-
-    const vectorStoreId = `Vector_index_${knowledgeBase.id.replace(/-/g, '_')}`
-
-    const vectorStore = new WeaviateStore(embeddings, {
-      client: weaviateClient,
-      indexName: vectorStoreId,
-      textKey: 'pageContent',
-      metadataKeys: ['knowledgeBaseId'],
-    })
-
-    const vectorIds = await vectorStore.addDocuments(chunkedDocs)
-
-    if (!vectorIds || vectorIds.length === 0) {
-      throw new Error('Failed to add data to Weaviate')
-    }
-
-    // Prismaにドキュメントを保存
-    const newDocument = await prisma.document.create({
+    const document = await prisma.document.create({
       data: {
         knowledgeBaseId: knowledgeBaseId,
         name: file.name,
+        status: 'PENDING',
+        enabled: false,
         metadata: {
           knowledgeBaseId,
         },
-        fileType: 'application/pdf',
-        chunkSize: chunkedDocs.length,
+        mimeType: file.type,
+        chunkSize: 0,
       },
     })
 
-    // チャンクをDocumentSegmentに保存
-
-    await prisma.documentSegment.createMany({
-      data: chunkedDocs.map((chunk, index) => ({
-        documentId: newDocument.id,
-        vectorId: vectorIds[index],
-        chunkContent: chunk.pageContent,
-        wordCount: chunk.pageContent.split(/\s+/).length,
-        keywords: [],
-        position: chunk.metadata.position,
-      })),
+    const job = await pdfProcessingQueue.add('processPDF', {
+      filePath: filePath,
+      documentId: document.id,
     })
-    return NextResponse.json({ message: 'PDF processed and added successfully' })
+
+    const processStatus = await prisma.processStatus.create({
+      data: {
+        id: job.id,
+        status: 'PENDING',
+      },
+    })
+
+    if (!job.id) {
+      throw new Error('Failed to start PDF processing')
+    }
+
+    return NextResponse.json({
+      message: 'PDF processing started',
+      statusId: processStatus.id,
+      document: document,
+    })
   } catch (error: unknown) {
     console.error('Error processing PDF:', error)
     if (error instanceof Error) {

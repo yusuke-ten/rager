@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
-import { Document } from '@prisma/client'
+import { format } from 'date-fns'
+import { useState, useEffect } from 'react'
+import { Document, DocumentStatus } from '@prisma/client'
 import {
   Trash,
   Pencil,
@@ -9,13 +10,13 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  LoaderCircle,
 } from 'lucide-react'
 
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { useLoading } from '@/hooks/use-loading'
 import { FileUpload } from '@/components/file-upload/file-upload'
 import { Dialog, DialogTitle, DialogHeader, DialogContent } from '@/components/ui/dialog'
 import {
@@ -33,6 +34,7 @@ import {
   TableHead,
   TableHeader,
 } from '@/components/ui/table'
+
 type Props = {
   documents: Document[]
   knowledgeBaseId: string
@@ -48,21 +50,25 @@ const Dataset = ({
   deleteDocument,
   handleChangeDocumentEnabled,
 }: Props) => {
-  const { startLoading, stopLoading } = useLoading()
+  const [localDocuments, setLocalDocuments] = useState<Document[]>(documents)
+
+  useEffect(() => {
+    setLocalDocuments(documents)
+  }, [documents])
+
   const [isOpen, setIsOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const { toast } = useToast()
 
   const onDeleteDocument = async (documentId: string) => {
     try {
-      startLoading()
       await deleteDocument(documentId)
+      refreshDocuments()
       toast({
         title: '成功',
         description: 'ドキュメントが削除されました',
         duration: 3000,
       })
-      refreshDocuments()
     } catch (error) {
       console.error(error)
       toast({
@@ -71,14 +77,11 @@ const Dataset = ({
         variant: 'destructive',
         duration: 3000,
       })
-    } finally {
-      stopLoading()
     }
   }
 
   const onClickAddDataset = async () => {
     try {
-      startLoading()
       const formData = new FormData()
       files.forEach((file) => formData.append('files', file))
 
@@ -91,9 +94,10 @@ const Dataset = ({
         throw new Error('アップロードに失敗しました')
       }
 
-      await response.json()
-      setIsOpen(false)
-      refreshDocuments()
+      const data = await response.json()
+      const document: Document = data.document
+      setLocalDocuments([document, ...localDocuments])
+      listenProcessingStatus(data.statusId, document.id)
       toast({
         title: '成功',
         description: 'ドキュメントがアップロードされました',
@@ -108,7 +112,46 @@ const Dataset = ({
         duration: 3000,
       })
     } finally {
-      stopLoading()
+      setIsOpen(false)
+    }
+  }
+
+  const listenProcessingStatus = async (statusId: string, documentId: string) => {
+    const eventSource = new EventSource(`/api/processing-status/${statusId}`)
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (data.status === 'COMPLETED') {
+        eventSource.close()
+        setLocalDocuments(
+          localDocuments.map((document) => {
+            if (document.id === documentId) {
+              return { ...document, status: 'COMPLETED' }
+            }
+            return document
+          }),
+        )
+        refreshDocuments()
+      }
+    }
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource failed:', error)
+      eventSource.close()
+    }
+  }
+
+  // document.statusの値によって色を変える関数
+  function changeColorBasedOnStatus(status: DocumentStatus) {
+    switch (status) {
+      case 'PENDING':
+        return 'text-orange-500'
+      case 'PROCESSING':
+        return 'text-blue-500'
+      case 'FAILED':
+        return 'text-red-500'
+      case 'COMPLETED':
+        return 'text-green-500'
     }
   }
 
@@ -134,17 +177,16 @@ const Dataset = ({
           <TableHeader>
             <TableRow>
               <TableHead className='w-[50px]'></TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Chunk Size</TableHead>
-              <TableHead>Upload Date</TableHead>
-              <TableHead>Chunk Method</TableHead>
-              <TableHead>Enable</TableHead>
-              <TableHead>Parsing Status</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead>名前</TableHead>
+              <TableHead>サイズ</TableHead>
+              <TableHead>有効</TableHead>
+              <TableHead>ステータス</TableHead>
+              <TableHead>アクション</TableHead>
+              <TableHead>アップロード日時</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {documents.map((document) => (
+            {localDocuments.map((document) => (
               <TableRow key={document.id}>
                 <TableCell></TableCell>
                 <TableCell>
@@ -160,8 +202,6 @@ const Dataset = ({
                   </Link>
                 </TableCell>
                 <TableCell>{document.chunkSize}</TableCell>
-                <TableCell>{document.createdAt.toLocaleString()}</TableCell>
-                <TableCell>General</TableCell>
                 <TableCell>
                   <Switch
                     checked={document.enabled}
@@ -171,12 +211,23 @@ const Dataset = ({
                   />
                 </TableCell>
                 <TableCell>
-                  <span className='text-orange-500'>CANCEL</span>
+                  <span
+                    className={`flex items-center gap-2 ${changeColorBasedOnStatus(
+                      document.status,
+                    )}`}
+                  >
+                    {document.status}{' '}
+                    {document.status !== 'COMPLETED' && (
+                      <LoaderCircle className='h-4 w-4 animate-spin' />
+                    )}
+                  </span>
                 </TableCell>
                 <TableCell className='flex space-x-2'>
-                  <Button variant='ghost' size='icon'>
-                    <Pencil className='h-4 w-4' />
-                  </Button>
+                  {document.status === 'COMPLETED' && (
+                    <Button variant='ghost' size='icon'>
+                      <Pencil className='h-4 w-4' />
+                    </Button>
+                  )}
                   <Button
                     variant='ghost'
                     size='icon'
@@ -188,6 +239,7 @@ const Dataset = ({
                     <Download className='h-4 w-4' />
                   </Button>
                 </TableCell>
+                <TableCell>{format(document.createdAt, 'yyyy-MM-dd HH:mm')}</TableCell>
               </TableRow>
             ))}
           </TableBody>

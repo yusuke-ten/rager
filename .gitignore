@@ -39,3 +39,7 @@ volumes
 
 .env
 *storybook.log
+
+storage
+
+logs

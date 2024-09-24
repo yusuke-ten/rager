@@ -8,7 +8,7 @@ export const botSeed = async (tenant: Tenant, knowledgeBase: KnowledgeBase) => {
       name: 'サンプルボット',
       description: 'これはサンプルのボットです。',
       type: 'CHATBOT',
-      BotKnowledgeBase: {
+      botKnowledgeBase: {
         create: {
           knowledgeBaseId: knowledgeBase.id,
         },

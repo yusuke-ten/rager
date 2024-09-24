@@ -35,7 +35,7 @@ export default async function DatasetPage({
     if (!knowledgeBase) {
       throw new Error('Knowledge base not found')
     }
-    const vectorStoreId = `Vector_index_${knowledgeBase.id.replace(/-/g, '_')}`
+    const vectorStoreId = `Vector_index_${knowledgeBase.id}`
 
     const vectorStore = await WeaviateStore.fromExistingIndex(embeddings, {
       client: weaviateClient,
