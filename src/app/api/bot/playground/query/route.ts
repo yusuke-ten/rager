@@ -57,7 +57,7 @@ export async function POST(
 
     const knowledgeBase = botKnowledgeBase.knowledgeBase
 
-    const vectorStoreId = `Vector_index_${knowledgeBase.id.replace(/-/g, '_')}`
+    const vectorStoreId = `Vector_index_${knowledgeBase.id}`
 
     const vectorStore = await WeaviateStore.fromExistingIndex(embeddings, {
       client: weaviateClient,

@@ -25,10 +25,19 @@ export default async function KnowledgePage() {
 
   const handleCreateKnowledge = async (knowledgeName: string) => {
     'use server'
+    const tenant = await getCurrentTenant()
+    if (!tenant) {
+      throw new Error('tenant not found')
+    }
     await prisma.knowledgeBase.create({
       data: {
         name: knowledgeName,
         description: '',
+        tenant: {
+          connect: {
+            id: tenant.id,
+          },
+        },
       },
     })
     revalidatePath('/dashboard/knowledge')
@@ -36,9 +45,14 @@ export default async function KnowledgePage() {
 
   const handleDeleteKnowledge = async (knowledgeBaseId: string) => {
     'use server'
+    const tenant = await getCurrentTenant()
+    if (!tenant) {
+      throw new Error('tenant not found')
+    }
     await prisma.knowledgeBase.delete({
       where: {
         id: knowledgeBaseId,
+        tenantId: tenant.id,
       },
     })
     revalidatePath('/dashboard/knowledge')

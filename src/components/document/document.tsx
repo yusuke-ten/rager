@@ -15,13 +15,6 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Dialog, DialogTitle, DialogHeader, DialogContent } from '@/components/ui/dialog'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 
 type Props = {
   document: DocumentType
@@ -55,39 +48,9 @@ const Document = ({
   }
 
   return (
-    <div className='container mx-auto'>
-      <Breadcrumb className='mb-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href='/dashboard/knowledge'>ナレッジベース</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink
-              href={`/dashboard/knowledge/${document.knowledgeBaseId}/dataset`}
-            >
-              データセット
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <span className='font-semibold text-gray-900'>チャンク</span>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
+    <>
       <div className='mb-4 flex items-center justify-between'>
         <div className='flex items-center'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='mr-2'
-            onClick={() => {
-              router.push(`/dashboard/knowledge/${document.knowledgeBaseId}/dataset`)
-            }}
-          >
-            <ChevronLeft className='h-4 w-4' />
-          </Button>
           <span className='font-medium'>{document.name}</span>
         </div>
         <div className='flex items-center space-x-2'>
@@ -205,7 +168,7 @@ const Document = ({
           </DialogContent>
         )}
       </Dialog>
-    </div>
+    </>
   )
 }
 

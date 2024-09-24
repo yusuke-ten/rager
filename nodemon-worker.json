@@ -1,0 +1,4 @@
+{
+  "watch": ["src/workers/pdfProcessingWorker.ts"],
+  "exec": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/workers/pdfProcessingWorker.ts"
+}

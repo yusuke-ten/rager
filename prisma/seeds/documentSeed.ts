@@ -44,7 +44,7 @@ export const documentSeed = async (knowledgeBase: KnowledgeBase) => {
     }),
   )
 
-  const vectorStoreId = `Vector_index_${knowledgeBase.id.replace(/-/g, '_')}`
+  const vectorStoreId = `Vector_index_${knowledgeBase.id}`
 
   const vectorStore = new WeaviateStore(openAIEmbeddings, {
     client: weaviateClient,
@@ -66,7 +66,7 @@ export const documentSeed = async (knowledgeBase: KnowledgeBase) => {
       metadata: {
         knowledgeBaseId: knowledgeBase.id,
       },
-      fileType: 'application/pdf',
+      mimeType: 'application/pdf',
       chunkSize: chunkedDocs.length,
     },
   })
