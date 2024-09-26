@@ -17,8 +17,8 @@ type Props = {
   setSystemPrompt: (prompt: string) => void
   temperature: number
   setTemperature: (temperature: number) => void
-  maxLength: number
-  setMaxLength: (maxLength: number) => void
+  maxTokens: number
+  setMaxTokens: (maxTokens: number) => void
   topP: number
   setTopP: (topP: number) => void
   topK: number
@@ -30,8 +30,8 @@ export const Setting = ({
   setSystemPrompt,
   temperature,
   setTemperature,
-  maxLength,
-  setMaxLength,
+  maxTokens,
+  setMaxTokens,
   topP,
   setTopP,
   topK,
@@ -39,7 +39,7 @@ export const Setting = ({
 }: Props) => {
   return (
     <div
-      className='relative hidden flex-col items-start gap-8 md:flex'
+      className='relative hidden flex-col items-start gap-8 overflow-y-scroll px-4 md:flex'
       x-chunk='dashboard-03-chunk-0'
     >
       <form className='grid w-full items-start gap-6'>
@@ -61,11 +61,11 @@ export const Setting = ({
           <div className='grid gap-3'>
             <SliderSelector
               label='Maximum Length'
-              defaultValue={[maxLength]}
+              defaultValue={[maxTokens]}
               max={8192}
               step={10}
               description='生成するトークンの最大数です。リクエストは最大2,048または4,000トークンを使用でき、プロンプトと完了の間で共有されます。正確な制限はモデルによって異なります。'
-              onCommit={(value) => setMaxLength(value)}
+              onCommit={(value) => setMaxTokens(value)}
             />
           </div>
           <div className='grid gap-3'>

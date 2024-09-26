@@ -41,7 +41,7 @@ export const Temperature: Story = {
   },
 }
 
-export const MaxLength: Story = {
+export const MaxTokens: Story = {
   args: {
     label: 'Maximum Length',
     defaultValue: [4000],

@@ -68,6 +68,8 @@ export const documentSeed = async (knowledgeBase: KnowledgeBase) => {
       },
       mimeType: 'application/pdf',
       chunkSize: chunkedDocs.length,
+      enabled: true,
+      status: 'COMPLETED',
     },
   })
 

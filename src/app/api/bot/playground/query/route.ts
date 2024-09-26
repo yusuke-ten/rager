@@ -34,7 +34,7 @@ export async function POST(
       query = '',
       systemPrompt = '',
       temperature = 0.7,
-      maxLength = 512,
+      maxTokens = 512,
       topP = 0.85,
       topK = 5,
     } = body
@@ -72,7 +72,7 @@ export async function POST(
       model: 'gpt-4o-mini',
       temperature,
       streaming: true,
-      maxTokens: maxLength,
+      maxTokens: maxTokens,
       topP,
     })
     const combineDocsChain = await createStuffDocumentsChain({

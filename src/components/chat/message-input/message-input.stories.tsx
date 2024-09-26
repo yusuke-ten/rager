@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { MessageInput } from './message-input'
 
 const meta: Meta<typeof MessageInput> = {
-  title: 'Chat/MessageInput',
+  title: 'Bot/Playground/MessageInput',
   component: MessageInput,
   tags: ['autodocs'],
 }
