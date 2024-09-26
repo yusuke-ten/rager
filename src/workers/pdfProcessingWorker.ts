@@ -1,15 +1,14 @@
-import type { WeaviateClient } from 'weaviate-ts-client'
 import type { Document } from '@langchain/core/documents'
 
 import dotenv from 'dotenv'
 import { Worker } from 'bullmq'
-import weaviate from 'weaviate-ts-client'
 import { WeaviateStore } from '@langchain/weaviate'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
 import prisma from '../lib/prisma'
 import { openAIEmbeddings } from '../lib/embeddings'
+import { weaviateClient } from '../lib/weaviateClient'
 
 dotenv.config()
 
@@ -17,11 +16,6 @@ function sanitizeText(text: string): string {
   text = text.replace(/\0/g, '')
   return text
 }
-
-export const weaviateClient: WeaviateClient = weaviate.client({
-  scheme: process.env.WEAVIATE_SCHEME || 'http',
-  host: process.env.WEAVIATE_HOST || 'localhost:8080',
-})
 
 const pdfProcessingWorker = new Worker(
   'pdfProcessing',

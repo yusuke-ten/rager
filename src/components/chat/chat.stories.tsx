@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Bot, Message, Conversation } from '@prisma/client'
+import { Message } from '@/types/message'
+import { Conversation } from '@/types/conversation'
 
 import { Chat } from './chat'
 
@@ -18,78 +19,59 @@ type Story = StoryObj<typeof Chat>
 
 const mockBot: Bot = {
   id: '1',
-  name: 'テストボット',
-  type: 'default',
-  description: null,
-  emptyResponse: null,
-  openeStatement: null,
-  showQuote: false,
-  systemPrompt: '',
-  similarityThreshold: 0,
-  keywordSimilarityWeight: 0,
-  topN: 0,
-  temperature: 0,
-  topP: 0,
-  maxTokens: 0,
+  name: 'ボット1',
+  description: 'これはテストボットです。',
   createdAt: new Date(),
   updatedAt: new Date(),
-  presencePenalty: 0,
-  frequencyPenalty: 0,
 }
 
-const mockConversationList: (Conversation & {
-  messages: Message[]
-})[] = [
+const mockMessage: Message[] = Array.from({ length: 100 }, (_, i) => ({
+  id: i.toString(),
+  content: `これはテストメッセージです。${i}`,
+  role: i % 2 === 0 ? 'human' : 'ai',
+}))
+
+const mockConversationList: Conversation[] = [
   {
     id: '1',
     name: '会話1',
-    botId: '1',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    messages: [
-      {
-        id: '1',
-        role: 'human',
-        content: 'こんにちは',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        conversationId: '1',
-      },
-      {
-        id: '2',
-        role: 'ai',
-        content: 'はい、こんにちは。どのようなご用件でしょうか？',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        conversationId: '1',
-      },
-    ],
+  },
+  {
+    id: '2',
+    name: '会話2',
   },
 ]
 
 export const Default: Story = {
   args: {
-    bot: {
-      ...mockBot,
-    },
-    conversationList: mockConversationList.map((conv) => ({
-      ...conv,
-      messages: conv.messages.map((msg) => ({
-        ...msg,
-        conversationId: conv.id,
-      })),
-    })),
+    bot: mockBot,
+    conversations: mockConversationList,
+    messages: mockMessage,
     conversationId: '1',
     handleCreateConversation: () => console.log('新しい会話を作成'),
     handleDeleteConversation: (id) => console.log(`会話 ${id} を削除`),
     handleRenameConversation: (id, newName) =>
       console.log(`会話 ${id} の名前を ${newName} に変更`),
+    availableLanguages: [
+      {
+        id: 'ja',
+        label: '日本語',
+      },
+    ],
   },
 }
 
 export const EmptyConversation: Story = {
   args: {
     ...Default.args,
-    conversationList: [],
+    conversations: [],
+    conversationId: undefined,
+    messages: [],
+    availableLanguages: [
+      {
+        id: 'ja',
+        label: '日本語',
+      },
+    ],
   },
 }

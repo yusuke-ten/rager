@@ -6,12 +6,15 @@ const meta: Meta<typeof Playground> = {
   title: 'Bot/Playground',
   component: Playground,
   tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+  },
 }
 export default meta
 type Story = StoryObj<typeof Playground>
 
 export const Default: Story = {
   args: {
-    children: 'Playgroundのデフォルト表示',
+    botId: '1',
   },
 }

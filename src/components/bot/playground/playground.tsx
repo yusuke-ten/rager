@@ -5,14 +5,31 @@ import { ChatList } from '@/components/chat/chat-list'
 import { Setting } from '@/components/bot/playground/setting'
 import { MessageInput } from '@/components/bot/playground/message-input'
 
+type Bot = {
+  id: string
+  name: string
+  description: string | null
+  emptyResponse: string | null
+  openStatement: string | null
+  showQuote: boolean
+  systemPrompt: string
+  similarityThreshold: number
+  keywordSimilarityWeight: number
+  temperature: number
+  topP: number
+  presencePenalty: number
+  frequencyPenalty: number
+  maxTokens: number
+}
+
+type Props = {
+  bot: Bot
+}
+
 export const description =
   'サイドバーのナビゲーションとメインコンテンツエリアを持つAIプレイグラウンド。プレイグラウンドには、設定ドロワーと共有ボタンを持つヘッダーがあります。サイドバーにはナビゲーションリンクとユーザーメニューがあります。メインコンテンツエリアには、モデルとメッセージを設定するためのフォームが表示されます。'
 
-type Props = {
-  botId: string
-}
-
-export function Playground({ botId }: Props) {
+export function Playground({ bot }: Props) {
   const [messages, setMessages] = useState<
     { type: 'question' | 'answer'; content: string }[]
   >([])
@@ -30,7 +47,7 @@ User's question: {input}
 Please provide a detailed and accurate answer.
     `)
   const [temperature, setTemperature] = useState<number>(0.7)
-  const [maxLength, setMaxLength] = useState<number>(512)
+  const [maxTokens, setMaxTokens] = useState<number>(512)
   const [topP, setTopP] = useState<number>(0.85)
   const [topK, setTopK] = useState<number>(5)
 
@@ -65,10 +82,10 @@ Please provide a detailed and accurate answer.
       },
       body: JSON.stringify({
         query,
-        botId,
+        botId: bot.id,
         systemPrompt,
         temperature,
-        maxLength,
+        maxTokens,
         topP,
         topK,
       }),
@@ -121,8 +138,8 @@ Please provide a detailed and accurate answer.
         setSystemPrompt={setSystemPrompt}
         temperature={temperature}
         setTemperature={setTemperature}
-        maxLength={maxLength}
-        setMaxLength={setMaxLength}
+        maxTokens={maxTokens}
+        setMaxTokens={setMaxTokens}
         topP={topP}
         setTopP={setTopP}
         topK={topK}

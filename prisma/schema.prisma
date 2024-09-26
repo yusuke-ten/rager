@@ -96,14 +96,14 @@ model Bot {
   type                    String
   description             String?
   emptyResponse           String?
-  openeStatement          String?
+  openStatement           String?
   showQuote               Boolean            @default(false)
   systemPrompt            String
   similarityThreshold     Float              @default(0.5)
   keywordSimilarityWeight Float              @default(0.5)
-  topN                    Int                @default(5)
   temperature             Float              @default(0.5)
   topP                    Float              @default(0.5)
+  topK                    Int                @default(5)
   presencePenalty         Float              @default(0.5)
   frequencyPenalty        Float              @default(0.5)
   maxTokens               Int                @default(512)

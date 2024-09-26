@@ -2,7 +2,8 @@
 import * as z from 'zod'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Trash2, FileIcon, MoreHorizontal } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Play, Trash2, BotIcon, MoreHorizontal } from 'lucide-react'
 
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
@@ -33,7 +34,7 @@ type Props = {
 export const Bot = ({ bots, handleCreateBot, handleDeleteBot }: Props) => {
   const [open, setOpen] = useState(false)
   const { toast } = useToast()
-
+  const router = useRouter()
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await handleCreateBot(values.botName)
@@ -63,7 +64,7 @@ export const Bot = ({ bots, handleCreateBot, handleDeleteBot }: Props) => {
         </div>
       </header>
 
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'>
         {bots.map((bot) => (
           <Link
             href={`/dashboard/bot/${bot.id}/playground`}
@@ -72,34 +73,43 @@ export const Bot = ({ bots, handleCreateBot, handleDeleteBot }: Props) => {
           >
             <Card className='w-full transition-shadow hover:shadow-md'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>{bot.name}</CardTitle>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant='ghost' className='h-8 w-8 p-0'>
-                      <MoreHorizontal className='h-4 w-4 text-muted-foreground' />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end'>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleDeleteBot(bot.id)
-                      }}
-                    >
-                      <Trash2 className='mr-2 h-4 w-4' />
-                      <span>削除</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <CardTitle className='flex items-center text-sm font-medium'>
+                  <BotIcon className='mr-2 h-6 w-6' />
+                  {bot.name}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-                  <FileIcon className='h-4 w-4' />
-                  {/* <span>{bot.id} Docs</span> */}
-                </div>
-                <div className='mt-2 text-xs text-muted-foreground'>
-                  {bot.createdAt.toDateString()}
+              <CardContent className='pt-12'>
+                <div className='mt-4 flex items-center justify-between space-x-2 text-sm text-muted-foreground'>
+                  <Button
+                    className=''
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.open(`/chat/${bot.id}`, '_blank')
+                    }}
+                  >
+                    <Play className='mr-2 h-4 w-4' />
+                    ボットを実行
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' className='h-8 w-8 p-0'>
+                        <MoreHorizontal className='h-4 w-4 text-muted-foreground' />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end'>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleDeleteBot(bot.id)
+                        }}
+                      >
+                        <Trash2 className='mr-2 h-4 w-4' />
+                        <span>削除</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>

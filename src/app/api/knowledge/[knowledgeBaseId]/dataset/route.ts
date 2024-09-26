@@ -1,24 +1,11 @@
-import type { WeaviateClient } from 'weaviate-ts-client'
-
 import fs from 'fs'
 import path from 'path'
 import cuid from 'cuid'
 import { Queue } from 'bullmq'
-import weaviate from 'weaviate-ts-client'
 import { NextResponse } from 'next/server'
-import { OpenAIEmbeddings } from '@langchain/openai'
 
 import prisma from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
-
-export const embeddings = new OpenAIEmbeddings({
-  openAIApiKey: process.env.OPENAI_API_KEY,
-})
-
-export const weaviateClient: WeaviateClient = weaviate.client({
-  scheme: process.env.WEAVIATE_SCHEME || 'http',
-  host: process.env.WEAVIATE_HOST || 'localhost:8080',
-})
 
 const pdfProcessingQueue = new Queue('pdfProcessing', {
   connection: {

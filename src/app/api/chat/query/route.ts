@@ -1,9 +1,6 @@
-import type { WeaviateClient } from 'weaviate-ts-client'
-
 import { PassThrough } from 'stream'
 import { ChatOpenAI } from '@langchain/openai'
 import { WeaviateStore } from '@langchain/weaviate'
-import { OpenAIEmbeddings } from '@langchain/openai'
 import { NextRequest, NextResponse } from 'next/server'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { createRetrievalChain } from 'langchain/chains/retrieval'
@@ -12,18 +9,9 @@ import { StringOutputParser } from '@langchain/core/output_parsers'
 import { createStuffDocumentsChain } from 'langchain/chains/combine_documents'
 
 import prisma from '@/lib/prisma'
+import { openAIEmbeddings } from '@/lib/embeddings'
+import { weaviateClient } from '@/lib/weaviateClient'
 import { PrismaMessageHistory } from '@/langchain/prismaMessageHistory'
-
-export const embeddings = new OpenAIEmbeddings({
-  openAIApiKey: process.env.OPENAI_API_KEY,
-})
-
-import weaviate from 'weaviate-ts-client'
-
-export const weaviateClient: WeaviateClient = weaviate.client({
-  scheme: process.env.WEAVIATE_SCHEME || 'http',
-  host: process.env.WEAVIATE_HOST || 'localhost:8080',
-})
 
 export const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -79,7 +67,7 @@ export async function POST(
 
     const vectorStoreId = `Vector_index_${knowledgeBase.id}`
 
-    const vectorStore = await WeaviateStore.fromExistingIndex(embeddings, {
+    const vectorStore = await WeaviateStore.fromExistingIndex(openAIEmbeddings, {
       client: weaviateClient,
       indexName: vectorStoreId,
       textKey: 'pageContent',

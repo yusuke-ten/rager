@@ -20,7 +20,7 @@ const mockBots = [
     createdAt: new Date(),
     updatedAt: new Date(),
     emptyResponse: null,
-    openeStatement: null,
+    openStatement: null,
     showQuote: false,
     systemPrompt: '',
     similarityThreshold: 0,
