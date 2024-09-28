@@ -13,6 +13,6 @@ type Story = StoryObj<typeof TenantForm>
 
 export const Default: Story = {
   args: {
-    children: 'TenantFormのデフォルト表示',
+    handleSubmit: () => Promise.resolve(),
   },
 }

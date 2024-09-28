@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
+import { DocumentStatus, DocumentSegment, Document as DocumentType } from '@prisma/client'
+
 import { Document } from './document'
 
 const meta: Meta<typeof Document> = {
@@ -14,19 +16,20 @@ const meta: Meta<typeof Document> = {
 export default meta
 type Story = StoryObj<typeof Document>
 
-const mockDocument = {
+const mockDocument: DocumentType = {
   id: '1',
   name: 'サンプルドキュメント',
   knowledgeBaseId: 'kb1',
   metadata: {},
-  fileType: 'text/plain',
+  mimeType: 'text/plain',
   chunkSize: 3,
   enabled: true,
+  status: DocumentStatus.COMPLETED,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
 
-const mockDocumentSegments = [
+const mockDocumentSegments: DocumentSegment[] = [
   {
     id: '1',
     documentId: '1',

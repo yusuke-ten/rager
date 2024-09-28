@@ -107,10 +107,10 @@ PaginationEllipsis.displayName = 'PaginationEllipsis'
 
 export {
   Pagination,
-  PaginationContent,
   PaginationLink,
   PaginationItem,
-  PaginationPrevious,
   PaginationNext,
+  PaginationContent,
+  PaginationPrevious,
   PaginationEllipsis,
 }

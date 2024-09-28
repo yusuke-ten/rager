@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
+import { Document, DocumentStatus } from '@prisma/client'
+
 import { Dataset } from './dataset'
 
 const meta: Meta<typeof Dataset> = {
@@ -11,28 +13,30 @@ const meta: Meta<typeof Dataset> = {
 export default meta
 type Story = StoryObj<typeof Dataset>
 
-const mockDocuments = [
+const mockDocuments: Document[] = [
   {
     id: '1',
     knowledgeBaseId: 'kb123',
     name: 'テストドキュメント1',
     metadata: {},
-    fileType: null,
+    mimeType: 'application/pdf',
     chunkSize: 1000,
     createdAt: new Date('2023-01-01'),
     updatedAt: new Date('2023-01-01'),
     enabled: true,
+    status: DocumentStatus.COMPLETED,
   },
   {
     id: '2',
     knowledgeBaseId: 'kb123',
     name: 'テストドキュメント2',
     metadata: {},
-    fileType: null,
+    mimeType: 'application/pdf',
     chunkSize: 500,
     createdAt: new Date('2023-02-01'),
     updatedAt: new Date('2023-02-01'),
     enabled: false,
+    status: DocumentStatus.PENDING,
   },
 ]
 

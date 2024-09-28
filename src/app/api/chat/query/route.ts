@@ -88,7 +88,7 @@ Reply in the following languages: {language}
 `)
 
     const model = new ChatOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY || '',
       model: 'gpt-4o-mini',
       temperature: bot.temperature,
       streaming: true,

@@ -30,6 +30,7 @@ type Props = {
 
 type Context = {
   id: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata: Record<string, any>
   pageContent: string
 }
@@ -55,8 +56,6 @@ export function Playground({ bot }: Props) {
   const [frequencyPenalty, setFrequencyPenalty] = useState<number>(0.5)
   const [emptyResponse, setEmptyResponse] = useState<string>(bot.emptyResponse || '')
   const [keywordSimilarityWeight, setKeywordSimilarityWeight] = useState<number>(0.5)
-  const [showQuote, setShowQuote] = useState<boolean>(bot.showQuote)
-  const [openStatement, setOpenStatement] = useState<string>(bot.openStatement || '')
   const [similarityThreshold, setSimilarityThreshold] = useState<number>(
     bot.similarityThreshold,
   )

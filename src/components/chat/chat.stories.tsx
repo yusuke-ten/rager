@@ -21,7 +21,18 @@ type Story = StoryObj<typeof Chat>
 const mockBot: Bot = {
   id: '1',
   name: 'ボット1',
-  description: 'これはテストボットです。',
+  description: '説明文',
+  emptyResponse: '応答がありません',
+  openStatement: '初期メッセージ',
+  showQuote: false,
+  systemPrompt: 'システムプロンプト',
+  similarityThreshold: 0.5,
+  keywordSimilarityWeight: 0.5,
+  temperature: 0.5,
+  topP: 0.5,
+  presencePenalty: 0.5,
+  frequencyPenalty: 0.5,
+  maxTokens: 1000,
 }
 
 const mockMessage: Message[] = Array.from({ length: 100 }, (_, i) => ({

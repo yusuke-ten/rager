@@ -1,7 +1,6 @@
 'use client'
 
-import { Bot } from '@prisma/client'
-
+import { Bot } from '@/types/bot'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'

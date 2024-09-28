@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { Dataset } from '@/components/dataset/dataset'
 import { checkKnowledgeBaseAccess } from '@/lib/auth/checkKnowledgeBaseAccess'
-export async function getDocuments(knowledgeBaseId: string) {
+
+async function getDocuments(knowledgeBaseId: string) {
   try {
     const documents = await prisma.document.findMany({
       where: {
