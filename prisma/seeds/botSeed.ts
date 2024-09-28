@@ -11,7 +11,15 @@ export const botSeed = async (tenant: Tenant, knowledgeBase: KnowledgeBase) => {
       emptyResponse: 'ヒットしませんでした',
       openStatement: 'これはサンプルのボットです。',
       showQuote: false,
-      systemPrompt: 'あなたはサンプルボットです。',
+      systemPrompt: `
+Answer the user's question based on the following context:
+{context}
+
+User's question: {input}
+
+Please provide a detailed and accurate answer.
+Reply in the following languages: {language}
+`,
       similarityThreshold: 0.5,
       keywordSimilarityWeight: 0.5,
       temperature: 0.5,

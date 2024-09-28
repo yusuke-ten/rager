@@ -14,7 +14,7 @@ type Props = {
 }
 
 export const MessageInput = ({ onSubmit, isDisabled }: Props) => {
-  const [query, setQuery] = useState('このPDFは何？')
+  const [query, setQuery] = useState('')
   const [isVoiceInput, setIsVoiceInput] = useState(false)
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

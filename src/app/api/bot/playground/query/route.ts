@@ -37,6 +37,7 @@ export async function POST(
       maxTokens = 512,
       topP = 0.85,
       topK = 5,
+      language = 'ja',
     } = body
 
     if (!botId || !query) {
@@ -75,6 +76,7 @@ export async function POST(
       maxTokens: maxTokens,
       topP,
     })
+
     const combineDocsChain = await createStuffDocumentsChain({
       llm: model,
       prompt,
@@ -99,6 +101,7 @@ export async function POST(
     const stream = await retrievalChain.stream({
       input: query,
       context,
+      language,
     })
 
     const encoder = new TextEncoder()

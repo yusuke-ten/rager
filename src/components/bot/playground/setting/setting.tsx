@@ -15,6 +15,8 @@ import { SliderSelector } from '../slider-selector'
 type Props = {
   systemPrompt: string
   setSystemPrompt: (prompt: string) => void
+  emptyResponse: string
+  setEmptyResponse: (response: string) => void
   temperature: number
   setTemperature: (temperature: number) => void
   maxTokens: number
@@ -23,6 +25,16 @@ type Props = {
   setTopP: (topP: number) => void
   topK: number
   setTopK: (topK: number) => void
+  keywordSimilarityWeight: number
+  setKeywordSimilarityWeight: (keywordSimilarityWeight: number) => void
+  similarityThreshold: number
+  setSimilarityThreshold: (similarityThreshold: number) => void
+  presencePenalty: number
+  setPresencePenalty: (presencePenalty: number) => void
+  frequencyPenalty: number
+  setFrequencyPenalty: (frequencyPenalty: number) => void
+  selectedLanguage: string
+  setSelectedLanguage: (language: string) => void
 }
 
 export const Setting = ({
@@ -36,6 +48,16 @@ export const Setting = ({
   setTopP,
   topK,
   setTopK,
+  keywordSimilarityWeight,
+  setKeywordSimilarityWeight,
+  similarityThreshold,
+  setSimilarityThreshold,
+  presencePenalty,
+  setPresencePenalty,
+  frequencyPenalty,
+  setFrequencyPenalty,
+  selectedLanguage,
+  setSelectedLanguage,
 }: Props) => {
   return (
     <div
@@ -78,7 +100,7 @@ export const Setting = ({
               onCommit={(value) => setTopP(value)}
             />
           </div>
-          <div className='mb-4 grid gap-3'>
+          <div className='grid gap-3'>
             <SliderSelector
               label='Top K'
               defaultValue={[topK]}
@@ -88,19 +110,60 @@ export const Setting = ({
               onCommit={(value) => setTopK(value)}
             />
           </div>
+          <div className='grid gap-3'>
+            <SliderSelector
+              label='Keyword Similarity Weight'
+              defaultValue={[keywordSimilarityWeight]}
+              max={1}
+              step={0.1}
+              description='キーワードの類似度の重みです。'
+              onCommit={(value) => setKeywordSimilarityWeight(value)}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <SliderSelector
+              label='Similarity Threshold'
+              defaultValue={[similarityThreshold]}
+              max={1}
+              step={0.1}
+              description='類似度のしきい値です。'
+              onCommit={(value) => setSimilarityThreshold(value)}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <SliderSelector
+              label='Presence Penalty'
+              defaultValue={[presencePenalty]}
+              max={1}
+              step={0.1}
+              description='存在ペナルティです。'
+              onCommit={(value) => setPresencePenalty(value)}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <SliderSelector
+              label='Frequency Penalty'
+              defaultValue={[frequencyPenalty]}
+              max={1}
+              step={0.1}
+              description='頻度ペナルティです。'
+              onCommit={(value) => setFrequencyPenalty(value)}
+            />
+          </div>
+          <div className='mb-4' />
         </fieldset>
         <fieldset className='grid gap-6 rounded-lg border p-4'>
           <legend className='-ml-1 px-1 text-sm font-medium'>メッセージ</legend>
           <div className='grid gap-3'>
-            <Label htmlFor='role'>役割</Label>
-            <Select defaultValue='system'>
+            <Label htmlFor='role'>言語</Label>
+            <Select defaultValue={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger>
-                <SelectValue placeholder='役割を選択' />
+                <SelectValue placeholder='言語を選択' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='system'>システム</SelectItem>
-                <SelectItem value='user'>ユーザー</SelectItem>
-                <SelectItem value='assistant'>アシスタント</SelectItem>
+                <SelectItem value='en'>英語</SelectItem>
+                <SelectItem value='ja'>日本語</SelectItem>
+                <SelectItem value='zh'>中国語</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
+import { Bot } from '@/types/bot'
 import { Message } from '@/types/message'
 import { Conversation } from '@/types/conversation'
 
@@ -21,8 +22,6 @@ const mockBot: Bot = {
   id: '1',
   name: 'ボット1',
   description: 'これはテストボットです。',
-  createdAt: new Date(),
-  updatedAt: new Date(),
 }
 
 const mockMessage: Message[] = Array.from({ length: 100 }, (_, i) => ({
@@ -54,7 +53,7 @@ export const Default: Story = {
       console.log(`会話 ${id} の名前を ${newName} に変更`),
     availableLanguages: [
       {
-        id: 'ja',
+        id: 'ja-JP',
         label: '日本語',
       },
     ],

@@ -13,7 +13,7 @@ type Props = {
 
 export const VoiceInput = ({ language, handleSubmit }: Props) => {
   const [isListening, setIsListening] = useState(false)
-  const [transcript, setTranscript] = useState('このPDFは何？')
+  const [transcript, setTranscript] = useState('')
 
   useEffect(() => {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()

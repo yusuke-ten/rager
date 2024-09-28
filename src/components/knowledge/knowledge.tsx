@@ -94,7 +94,7 @@ const Knowledge = ({
           </div>
         </header>
 
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'>
           {knowledgeBases.map((kb) => (
             <Link
               href={`/dashboard/knowledge/${kb.id}/dataset`}
@@ -104,33 +104,36 @@ const Knowledge = ({
               <Card className='w-full transition-shadow hover:shadow-md'>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>{kb.name}</CardTitle>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' className='h-8 w-8 p-0'>
-                        <MoreHorizontal className='h-4 w-4 text-muted-foreground' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleDeleteKnowledge(kb.id)
-                        }}
-                      >
-                        <Trash2 className='mr-2 h-4 w-4' />
-                        <span>削除</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </CardHeader>
-                <CardContent>
-                  <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-                    <FileIcon className='h-4 w-4' />
-                    {/* <span>{kb.id} Docs</span> */}
-                  </div>
-                  <div className='mt-2 text-xs text-muted-foreground'>
-                    {kb.createdAt.toDateString()}
+                <CardContent className='pt-12'>
+                  <div className='mt-4 flex items-center justify-between space-x-2 text-sm text-muted-foreground'>
+                    <div>
+                      <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+                        <FileIcon className='h-4 w-4' />
+                      </div>
+                      <div className='mt-2 text-xs text-muted-foreground'>
+                        {kb.createdAt.toDateString()}
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' className='h-8 w-8 p-0'>
+                          <MoreHorizontal className='h-4 w-4 text-muted-foreground' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDeleteKnowledge(kb.id)
+                          }}
+                        >
+                          <Trash2 className='mr-2 h-4 w-4' />
+                          <span>削除</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </CardContent>
               </Card>

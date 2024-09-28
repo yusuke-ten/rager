@@ -13,13 +13,6 @@ import { openAIEmbeddings } from '@/lib/embeddings'
 import { weaviateClient } from '@/lib/weaviateClient'
 import { PrismaMessageHistory } from '@/langchain/prismaMessageHistory'
 
-export const model = new ChatOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-4o-mini',
-  temperature: 0.7,
-  streaming: true,
-})
-
 type QueryResponse = {
   // レスポンスの型をここに定義
 }
@@ -33,6 +26,7 @@ export async function POST(
     let { conversationId } = body
     const query = body.query || 'このPDFは何？'
     const botId = body.botId
+    const language = body.language || 'en'
 
     if (!botId) {
       throw new Error('Bot ID is required')
@@ -50,20 +44,29 @@ export async function POST(
       conversationId = conversation.id
     }
 
-    const botKnowledgeBase = await prisma.botKnowledgeBase.findFirst({
+    const bot = await prisma.bot.findFirst({
       where: {
-        botId: botId,
+        id: botId,
       },
       include: {
-        knowledgeBase: true,
+        botKnowledgeBase: {
+          include: {
+            knowledgeBase: true,
+          },
+        },
       },
     })
 
-    if (!botKnowledgeBase || !botKnowledgeBase.knowledgeBase) {
-      throw new Error('Knowledge base not found for this bot')
+    if (
+      !bot ||
+      !bot.botKnowledgeBase ||
+      !bot.botKnowledgeBase[0] ||
+      !bot.botKnowledgeBase[0].knowledgeBase
+    ) {
+      throw new Error('Bot not found')
     }
 
-    const knowledgeBase = botKnowledgeBase.knowledgeBase
+    const knowledgeBase = bot.botKnowledgeBase[0]?.knowledgeBase
 
     const vectorStoreId = `Vector_index_${knowledgeBase.id}`
 
@@ -73,14 +76,27 @@ export async function POST(
       textKey: 'pageContent',
       metadataKeys: ['knowledgeBaseId'],
     })
+
     const prompt = ChatPromptTemplate.fromTemplate(`
-      Answer the user's question based on the following context:
-      {context}
+Answer the user's question based on the following context:
+{context}
 
-      User's question: {input}
+User's question: {input}
 
-      Please provide a detailed and accurate answer.
-    `)
+Please provide a detailed and accurate answer.
+Reply in the following languages: {language}
+`)
+
+    const model = new ChatOpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      model: 'gpt-4o-mini',
+      temperature: bot.temperature,
+      streaming: true,
+      maxTokens: bot.maxTokens,
+      topP: bot.topP,
+      presencePenalty: bot.presencePenalty,
+      frequencyPenalty: bot.frequencyPenalty,
+    })
 
     const combineDocsChain = await createStuffDocumentsChain({
       llm: model,
@@ -88,7 +104,7 @@ export async function POST(
       outputParser: new StringOutputParser(),
     })
 
-    const results = await vectorStore.similaritySearch(query, 5) // 上位5つの結果を取得
+    const results = await vectorStore.similaritySearch(query, bot.topK) // 上位5つの結果を取得
 
     if (results.length === 0) {
       return NextResponse.json({ message: 'No results found' }, { status: 404 })
@@ -106,6 +122,7 @@ export async function POST(
     const stream = await retrievalChain.stream({
       input: query,
       context,
+      language,
     })
 
     const encoder = new TextEncoder()
@@ -154,20 +171,8 @@ export async function POST(
         Connection: 'keep-alive',
       },
     })
-
-    // return NextResponse.json({ message: response });
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
-
-// export async function POST(req: NextRequest): Promise<NextResponse<QueryResponse>> {
-//   try {
-//     const body = await req.json()
-//     return NextResponse.json({ message: 'Query POST request successful', body })
-//   } catch (error) {
-//     console.error(error)
-//     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
-//   }
-// }

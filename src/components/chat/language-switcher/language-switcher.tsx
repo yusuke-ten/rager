@@ -1,6 +1,7 @@
 import { Languages } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { RFC5646LanguageTag } from '@/lib/rfc5646-language-tags'
 import {
   Select,
   SelectItem,
@@ -10,10 +11,10 @@ import {
 } from '@/components/ui/select'
 
 type Props = {
-  selectedLanguage: string
-  setSelectedLanguage: (id: string) => void
+  selectedLanguage: RFC5646LanguageTag
+  setSelectedLanguage: (id: RFC5646LanguageTag) => void
   languageList: {
-    id: string
+    id: RFC5646LanguageTag
     label: string
   }[]
 }

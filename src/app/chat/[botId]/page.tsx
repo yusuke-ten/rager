@@ -138,8 +138,20 @@ export default async function ChatPage({
       conversationId={conversationId}
       availableLanguages={[
         {
-          id: 'en',
+          id: 'en-US',
           label: 'English',
+        },
+        {
+          id: 'ja-JP',
+          label: '日本語',
+        },
+        {
+          id: 'ko-KR',
+          label: '한국어',
+        },
+        {
+          id: 'zh-CN',
+          label: '中国語',
         },
       ]}
       conversations={conversationList}
