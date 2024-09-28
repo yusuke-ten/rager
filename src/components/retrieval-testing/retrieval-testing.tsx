@@ -23,13 +23,6 @@ import {
   SelectContent,
   SelectTrigger,
 } from '@/components/ui/select'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 
 type Props = {
   knowledgeBaseId: string
@@ -48,19 +41,7 @@ const RetrievalTesting = ({ knowledgeBaseId, handleRetrievalTesting }: Props) =>
   }
 
   return (
-    <div className='container mx-auto p-4'>
-      <Breadcrumb className='mb-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href='/dashboard/knowledge'>ナレッジベース</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <span className='font-semibold text-gray-900'>検索テスト</span>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
+    <>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
         <div className='md:col-span-1'>
           <Card>
@@ -190,7 +171,7 @@ const RetrievalTesting = ({ knowledgeBaseId, handleRetrievalTesting }: Props) =>
           </Select>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

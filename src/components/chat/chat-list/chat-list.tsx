@@ -1,6 +1,6 @@
 'use client'
 
-import React, { forwardRef } from 'react'
+import React from 'react'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
 
@@ -14,9 +14,9 @@ type Props = {
   }[]
 }
 
-export const ChatList = forwardRef<HTMLDivElement, Props>(({ messages }, ref) => {
+export const ChatList: React.FC<Props> = ({ messages }) => {
   return (
-    <ScrollArea ref={ref}>
+    <ScrollArea>
       {messages.map((message, index) => (
         <div
           key={index}
@@ -28,6 +28,6 @@ export const ChatList = forwardRef<HTMLDivElement, Props>(({ messages }, ref) =>
       ))}
     </ScrollArea>
   )
-})
+}
 
 ChatList.displayName = 'ChatList'

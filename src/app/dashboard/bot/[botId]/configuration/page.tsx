@@ -1,9 +1,6 @@
 import prisma from '@/lib/prisma'
 import { getCurrentTenant } from '@/lib/auth/getCurrentTenant'
-import {
-  FormData,
-  Configuration,
-} from '@/components/bot/configuration/configuration/configuration'
+import { FormData, Configuration } from '@/components/bot/configuration/configuration'
 
 const getBot = async (botId: string) => {
   const currentTenant = await getCurrentTenant()
