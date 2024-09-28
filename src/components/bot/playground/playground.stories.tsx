@@ -15,6 +15,21 @@ type Story = StoryObj<typeof Playground>
 
 export const Default: Story = {
   args: {
-    botId: '1',
+    bot: {
+      id: '1',
+      name: 'Bot 1',
+      description: 'Bot 1の説明',
+      emptyResponse: 'Bot 1の空の応答',
+      openStatement: 'Bot 1の開始文',
+      showQuote: true,
+      systemPrompt: 'Bot 1のシステムプロンプト',
+      similarityThreshold: 0.5,
+      keywordSimilarityWeight: 0.5,
+      temperature: 0.7,
+      topP: 0.85,
+      presencePenalty: 0.5,
+      frequencyPenalty: 0.5,
+      maxTokens: 512,
+    },
   },
 }

@@ -54,6 +54,7 @@ export const WithImage: Story = {
       </HoverCardTrigger>
       <HoverCardContent className='w-80'>
         <div className='flex space-x-4'>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src='https://via.placeholder.com/100'
             alt='サンプル画像'

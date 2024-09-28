@@ -13,6 +13,8 @@ type Story = StoryObj<typeof ProfileForm>
 
 export const Default: Story = {
   args: {
-    children: 'ProfileFormのデフォルト表示',
+    handleSubmit: () => {
+      console.log('submit')
+    },
   },
 }

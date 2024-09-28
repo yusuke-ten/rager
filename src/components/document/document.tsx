@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Type, Copy, AtSign } from 'lucide-react'
 import { Plus, Search, ChevronLeft, MoreVertical } from 'lucide-react'
 import {
@@ -30,7 +29,6 @@ const Document = ({
   documentSegments,
   handleChangeDocumentSegmentEnabled,
 }: Props) => {
-  const router = useRouter()
   const [editingSegment, setEditingSegment] = useState<DocumentSegmentType | null>(null)
 
   const handleEditClick = (segment: DocumentSegmentType) => {

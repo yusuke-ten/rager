@@ -25,7 +25,7 @@ export const Default: Story = {
     )
   },
   args: {
-    conversationList: [
+    conversations: [
       {
         id: '2',
         label: 'Talk about AI',

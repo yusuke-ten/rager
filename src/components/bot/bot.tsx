@@ -2,7 +2,6 @@
 import * as z from 'zod'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Play, Trash2, BotIcon, MoreHorizontal } from 'lucide-react'
 
 import { useToast } from '@/hooks/use-toast'
@@ -34,7 +33,6 @@ type Props = {
 export const Bot = ({ bots, handleCreateBot, handleDeleteBot }: Props) => {
   const [open, setOpen] = useState(false)
   const { toast } = useToast()
-  const router = useRouter()
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await handleCreateBot(values.botName)

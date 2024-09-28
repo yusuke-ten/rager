@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import { useState } from 'react'
 
+import { RFC5646LanguageTag } from '@/lib/rfc5646-language-tags'
+
 import { LanguageSwitcher } from './language-switcher'
 
 const meta: Meta<typeof LanguageSwitcher> = {
@@ -15,7 +17,7 @@ type Story = StoryObj<typeof LanguageSwitcher>
 
 export const Default: Story = {
   render: (args) => {
-    const [selectedLanguage, setSelectedLanguage] = useState('ja')
+    const [selectedLanguage, setSelectedLanguage] = useState<RFC5646LanguageTag>('ja')
     return (
       <LanguageSwitcher
         {...args}

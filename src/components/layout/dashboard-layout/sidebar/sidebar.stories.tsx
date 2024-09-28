@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
+import { Home, FileText } from 'lucide-react'
+
 import { Sidebar } from './sidebar'
 
 const meta: Meta<typeof Sidebar> = {
@@ -16,6 +18,12 @@ type Story = StoryObj<typeof Sidebar>
 
 export const Default: Story = {
   args: {
-    children: 'children',
+    navItems: [
+      { href: '/', icon: <Home />, label: 'ホーム' },
+      { href: '/dataset', icon: <FileText />, label: 'データセット' },
+      { href: '/document', icon: <FileText />, label: 'ドキュメント' },
+    ],
+    isExpanded: true,
+    setIsExpanded: () => {},
   },
 }

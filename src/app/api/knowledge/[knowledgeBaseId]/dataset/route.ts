@@ -133,9 +133,3 @@ export async function POST(
     }
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
