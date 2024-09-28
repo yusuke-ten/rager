@@ -21,6 +21,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          OPENAI_API_KEY: ''
 
       - name: Lint
         run: npm run lint
