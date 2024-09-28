@@ -19,10 +19,44 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create .env file
+        run: |
+          echo "NEXT_PUBLIC_BASE_PATH="dummy-value" >> .env
+          echo "NEXT_PUBLIC_SERVER_URL="dummy-value" >> .env
+          echo "NEXT_PUBLIC_ASSET_URL="dummy-value" >> .env
+          echo "NEXT_PUBLIC_SUPABASE_URL="dummy-value" >> .env
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-value" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY="dummy-value" >> .env
+          echo "OPENAI_API_KEY="dummy-value" >> .env
+          echo "OPENAI_API_KEY="dummy-value" >> .env
+          echo "PGUSER="dummy-value" >> .env
+          echo "POSTGRES_PASSWORD="dummy-value" >> .env
+          echo "POSTGRES_DB="dummy-value" >> .env
+          echo "PGDATA="dummy-value" >> .env
+          echo "POSTGRES_MAX_CONNECTIONS="dummy-value" >> .env
+          echo "POSTGRES_SHARED_BUFFERS="dummy-value" >> .env
+          echo "POSTGRES_WORK_MEM="dummy-value" >> .env
+          echo "POSTGRES_MAINTENANCE_WORK_MEM="dummy-value" >> .env
+          echo "POSTGRES_EFFECTIVE_CACHE_SIZE="dummy-value" >> .env
+          echo "EXPOSE_DB_PORT="dummy-value" >> .env
+          echo "DATABASE_URL="postgresql://postgres:possw0rd@localhost:5432/rager?schema="dummy-value" >> .env
+          echo "EXPOSE_WEAVIATE_PORT="dummy-value" >> .env
+          echo "WEAVIATE_QUERY_LIMIT="dummy-value" >> .env
+          echo "WEAVIATE_ANONYMOUS_ACCESS="dummy-value" >> .env
+          echo "WEAVIATE_VECTORIZER_MODULE="dummy-value" >> .env
+          echo "WEAVIATE_MODULES="dummy-value" >> .env
+          echo "NEO4J_URI="dummy-value" >> .env
+          echo "EXPOSE_NEO4J_HTTP_PORT="dummy-value" >> .env
+          echo "EXPOSE_NEO4J_BOLT_PORT="dummy-value" >> .env
+          echo "NEO4J_AUTH="dummy-value" >> .env
+          echo "NEO4J_HEAP_SIZE="dummy-value" >> .env
+          echo "NEO4J_HEAP_MAX_SIZE="dummy-value" >> .env
+          echo "REDIS_HOST="dummy-value" >> .env
+          echo "REDIS_PASSWORD="dummy-value" >> .env
+          echo "EXPOSE_REDIS_PORT="dummy-value" >> .env
+
       - name: Build
         run: npm run build
-        env:
-          OPENAI_API_KEY: 'dummy-api-key'
 
       - name: Lint
         run: npm run lint
