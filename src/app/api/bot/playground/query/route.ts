@@ -57,7 +57,7 @@ export async function POST(
     const prompt = ChatPromptTemplate.fromTemplate(systemPrompt)
 
     const model = new ChatOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY || '',
       model: 'gpt-4o-mini',
       temperature,
       streaming: true,
