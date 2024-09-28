@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          OPENAI_API_KEY: ''
+          OPENAI_API_KEY: 'dummy-api-key'
 
       - name: Lint
         run: npm run lint
